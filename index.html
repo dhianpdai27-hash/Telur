@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUMDes Mandiri - Pro System</title>
+    <title>BUMDes Mandiri - Android Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -18,18 +18,17 @@
         input { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; width: 100%; font-weight: 600; margin-top: 4px; }
         label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
 
-        /* AREA PRINT KHUSUS */
-        #print-area { display: none; }
+        /* TEKNIK CETAK ANDROID WEBVIEW */
         @media print {
-            body * { display: none !important; }
-            #print-area { display: block !important; background: white; }
-            #print-area * { display: block !important; }
+            .no-print { display: none !important; }
+            #print-section { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; z-index: 9999; }
         }
+        #print-section { display: none; }
     </style>
 </head>
 <body>
 
-<div id="main-app" class="no-print">
+<div class="no-print">
     <div class="bg-[#0f172a] p-6 text-white rounded-b-[25px] mb-4 shadow-xl">
         <div class="flex justify-between items-center">
             <div>
@@ -44,7 +43,6 @@
     </div>
 
     <div class="container mx-auto px-4">
-        
         <div id="tab-kasir" class="tab active space-y-4">
             <div class="card space-y-3">
                 <div><label>Nama Admin</label><input type="text" id="admin" placeholder="Petugas"></div>
@@ -57,7 +55,7 @@
                 <p class="text-[10px] font-bold text-blue-100 uppercase">Total Pembayaran</p>
                 <h2 id="total-display" class="text-4xl font-black text-white">Rp 0</h2>
             </div>
-            <button onclick="simpanDanCetak()" class="w-full bg-[#0f172a] text-white py-4 rounded-xl font-black text-lg shadow-lg">SIMPAN & CETAK NOTA</button>
+            <button onclick="simpanDanCetak()" class="w-full bg-[#0f172a] text-white py-4 rounded-xl font-black text-lg shadow-lg uppercase">Simpan & Cetak</button>
         </div>
 
         <div id="tab-biaya" class="tab space-y-4">
@@ -74,19 +72,19 @@
         </div>
 
         <div id="tab-riwayat" class="tab space-y-3">
-            <h6 class="font-black text-slate-800 text-xs uppercase px-1">Riwayat Transaksi</h6>
+            <h6 class="font-black text-slate-800 text-xs uppercase px-1">Riwayat Transaksi Lengkap</h6>
             <div id="list-riwayat" class="space-y-2 pb-5"></div>
         </div>
 
         <div id="tab-laporan" class="tab space-y-4">
             <div class="card border-t-4 border-slate-900 text-center">
-                <h6 class="font-bold text-xs mb-2 uppercase">Laporan Harian</h6>
+                <h6 class="font-bold text-xs mb-2">LAPORAN HARIAN</h6>
                 <input type="date" id="tgl-lap" onchange="updateLaporan()">
                 <div id="res-harian" class="my-3 p-3 bg-slate-50 rounded font-bold text-sm">Pilih Tanggal</div>
                 <button onclick="cetakLaporan('Harian')" class="w-full bg-slate-800 text-white py-3 rounded-lg font-bold text-[10px]">CETAK HARIAN</button>
             </div>
             <div class="card border-t-4 border-blue-600 text-center">
-                <h6 class="font-bold text-xs mb-2 text-blue-600 uppercase">Pembukuan Bulanan</h6>
+                <h6 class="font-bold text-xs mb-2 text-blue-600">PEMBUKUAN BULANAN</h6>
                 <input type="month" id="bln-lap" onchange="updateLaporan()">
                 <div id="res-bulanan" class="my-3 p-3 bg-blue-50 rounded font-bold text-sm text-blue-800">Pilih Bulan</div>
                 <button onclick="cetakLaporan('Bulanan')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-[10px]">CETAK BULANAN</button>
@@ -94,14 +92,13 @@
         </div>
 
         <div id="tab-opsi" class="tab space-y-4">
-            <div class="card">
+            <div class="card text-center">
                 <button onclick="exportExcel()" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold">BACKUP EXCEL</button>
-                <div class="border-t mt-6 pt-4 border-dashed text-center">
+                <div class="mt-6 border-t pt-4 border-dashed">
                     <input type="file" id="file-import" class="text-[10px] mb-3">
                     <button onclick="importExcel()" class="w-full bg-slate-100 text-slate-600 py-2 rounded font-bold text-[10px]">IMPORT DATA</button>
                 </div>
             </div>
-            <button onclick="resetData()" class="w-full text-red-400 text-[10px] font-bold uppercase opacity-20">Hapus Data</button>
         </div>
     </div>
 
@@ -114,11 +111,11 @@
     </nav>
 </div>
 
-<div id="print-area"></div>
+<div id="print-section"></div>
 
 <script>
-    let db_trx = JSON.parse(localStorage.getItem('db_v14_trx')) || [];
-    let db_biaya = JSON.parse(localStorage.getItem('db_v14_biaya')) || [];
+    let db_trx = JSON.parse(localStorage.getItem('db_v15_trx')) || [];
+    let db_biaya = JSON.parse(localStorage.getItem('db_v15_biaya')) || [];
 
     window.onload = () => {
         document.getElementById('tgl-skrg').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -147,39 +144,42 @@
         document.getElementById('dash-omzet').innerText = "Rp " + (o - b).toLocaleString('id-ID');
     }
 
-    // FUNGSI PRINT TANPA WINDOW BARU (Logika Paling Kompatibel Android)
-    function eksekusiCetak(html) {
-        const area = document.getElementById('print-area');
-        area.innerHTML = `
-            <div style="font-family:monospace; padding:30px; text-align:center;">
-                <h2 style="margin:0">BUMDes MANDIRI</h2>
+    // LOGIKA PRINT TANPA WINDOW BARU (SANGAT COMPATIBLE ANDROID)
+    function panggilPrint(content) {
+        const printSec = document.getElementById('print-section');
+        printSec.innerHTML = `
+            <div style="font-family:monospace; padding:30px; text-align:center; background:white; color:black;">
+                <h3 style="margin:0">BUMDes MANDIRI</h3>
                 <small>${new Date().toLocaleString()}</small><hr style="border-top:1px dashed #000">
-                ${html}
+                ${content}
                 <hr style="border-top:1px dashed #000">
                 <p>Terima Kasih</p>
             </div>
         `;
         window.print();
+        // Bersihkan area print setelah printer muncul agar tidak mengganggu
+        setTimeout(() => { printSec.innerHTML = ""; }, 2000);
     }
 
     function simpanDanCetak() {
         const adm = document.getElementById('admin').value;
         const kg = Number(document.getElementById('berat').value);
         const hrg = Number(document.getElementById('harga').value);
-        if(!adm || !kg) return alert("Mohon isi Admin & Berat!");
+        if(!adm || !kg) return alert("Isi data!");
 
         const item = { id: Date.now(), tgl: new Date().toISOString(), adm, kg, hrg, total: kg * hrg };
         db_trx.push(item);
-        localStorage.setItem('db_v14_trx', JSON.stringify(db_trx));
+        localStorage.setItem('db_v15_trx', JSON.stringify(db_trx));
 
-        const notaHtml = `
-            <div style="text-align:left; margin:20px 0;">
-                <p><b>Admin:</b> ${item.adm}</p>
-                <p><b>Rincian:</b> ${item.kg}Kg x Rp ${item.hrg.toLocaleString()}</p>
-                <h2 style="text-align:center; margin-top:20px;">TOTAL: Rp ${item.total.toLocaleString()}</h2>
+        const nota = `
+            <div style="text-align:left; margin-bottom:15px">
+                <p>Admin: ${item.adm}</p>
+                <p>Detail: ${item.kg} Kg x Rp ${item.hrg.toLocaleString()}</p>
             </div>
+            <h2 style="margin:20px 0">TOTAL: Rp ${item.total.toLocaleString()}</h2>
         `;
-        eksekusiCetak(notaHtml);
+        
+        panggilPrint(nota);
         document.getElementById('berat').value = ""; hitung();
         updateDashboard();
     }
@@ -189,7 +189,7 @@
         const nom = Number(document.getElementById('nom-biaya').value);
         if(!nom) return alert("Isi nominal!");
         db_biaya.push({ id: Date.now(), tgl: new Date().toISOString(), ket, nominal: nom });
-        localStorage.setItem('db_v14_biaya', JSON.stringify(db_biaya));
+        localStorage.setItem('db_v15_biaya', JSON.stringify(db_biaya));
         document.getElementById('ket-biaya').value = ""; document.getElementById('nom-biaya').value = "";
         renderBiaya(); updateDashboard();
     }
@@ -199,21 +199,21 @@
             <div class="card flex justify-between items-center py-3 border-r-4 border-red-500">
                 <div><b class="text-xs uppercase">${b.ket}</b><br><small class="text-slate-400">${b.tgl.slice(0,10)}</small></div>
                 <b class="text-red-600 text-sm">Rp ${b.nominal.toLocaleString()}</b>
-            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-5">Belum ada pengeluaran</p>';
+            </div>`).join('');
     }
 
-    // RIWAYAT LENGKAP DENGAN KG DAN HARGA
+    // RIWAYAT LENGKAP: ADA KG DAN HARGA
     function renderRiwayat() {
         document.getElementById('list-riwayat').innerHTML = db_trx.slice().reverse().map(x => `
             <div class="card space-y-2">
-                <div class="flex justify-between items-start border-b pb-2">
+                <div class="flex justify-between items-center border-b pb-1">
                     <div>
                         <b class="text-sm uppercase text-slate-800">${x.adm}</b>
-                        <p class="text-[10px] text-slate-400">${x.tgl.replace('T', ' ').slice(0,16)}</p>
+                        <p class="text-[9px] text-slate-400">${x.tgl.replace('T',' ').slice(0,16)}</p>
                     </div>
-                    <b class="text-blue-600 font-black">Rp ${x.total.toLocaleString()}</b>
+                    <b class="text-blue-600 text-md">Rp ${x.total.toLocaleString()}</b>
                 </div>
-                <div class="flex justify-between text-[11px] font-bold text-slate-500 uppercase">
+                <div class="flex justify-between text-[11px] font-bold text-slate-500">
                     <span>${x.kg} Kg</span>
                     <span>@ Rp ${x.hrg.toLocaleString()}</span>
                 </div>
@@ -226,19 +226,19 @@
         if(d) {
             const o = db_trx.filter(x => x.tgl.startsWith(d)).reduce((a,b)=>a+b.total,0);
             const b = db_biaya.filter(x => x.tgl.startsWith(d)).reduce((a,b)=>a+b.nominal,0);
-            document.getElementById('res-harian').innerHTML = `Omzet: Rp ${o.toLocaleString()}<br>Biaya: Rp ${b.toLocaleString()}<br>Net: Rp ${(o-b).toLocaleString()}`;
+            document.getElementById('res-harian').innerHTML = `Omzet: Rp ${o.toLocaleString()}<br>Biaya: Rp ${b.toLocaleString()}<br>Laba: Rp ${(o-b).toLocaleString()}`;
         }
         if(m) {
             const oM = db_trx.filter(x => x.tgl.startsWith(m)).reduce((a,b)=>a+b.total,0);
             const bM = db_biaya.filter(x => x.tgl.startsWith(m)).reduce((a,b)=>a+b.nominal,0);
-            document.getElementById('res-bulanan').innerHTML = `Omzet: Rp ${oM.toLocaleString()}<br>Biaya: Rp ${bM.toLocaleString()}<br>Laba: Rp ${(oM-bM).toLocaleString()}`;
+            document.getElementById('res-bulanan').innerHTML = `Total Omzet: Rp ${oM.toLocaleString()}<br>Total Biaya: Rp ${bM.toLocaleString()}<br>Laba Bersih: Rp ${(oM-bM).toLocaleString()}`;
         }
     }
 
     function cetakLaporan(tipe) {
         const isi = (tipe === 'Harian') ? document.getElementById('res-harian').innerHTML : document.getElementById('res-bulanan').innerHTML;
-        if(!isi || isi.includes("Pilih")) return alert("Pilih data dulu!");
-        eksekusiCetak(`<h3>LAPORAN ${tipe.toUpperCase()}</h3><br>${isi}`);
+        if(!isi || isi.includes("Pilih")) return alert("Pilih tanggal!");
+        panggilPrint(`<h4>LAPORAN ${tipe.toUpperCase()}</h4><br>${isi}`);
     }
 
     function exportExcel() {
@@ -256,16 +256,12 @@
             const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
             db_trx = XLSX.utils.sheet_to_json(wb.Sheets.Transaksi);
             db_biaya = XLSX.utils.sheet_to_json(wb.Sheets.Biaya);
-            localStorage.setItem('db_v14_trx', JSON.stringify(db_trx));
-            localStorage.setItem('db_v14_biaya', JSON.stringify(db_biaya));
-            alert("Berhasil!"); location.reload();
+            localStorage.setItem('db_v15_trx', JSON.stringify(db_trx));
+            localStorage.setItem('db_v15_biaya', JSON.stringify(db_biaya));
+            alert("Data Berhasil Diimpor!"); location.reload();
         };
         r.readAsArrayBuffer(f);
     }
-
-    function resetData() { if(confirm("Hapus semua?")) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
 </html>
-
-
