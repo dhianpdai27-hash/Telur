@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Telur BUMDes Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-size: 1.1rem; }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        input, select { font-size: 1.1rem !important; padding: 12px !important; }
+        button { font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media print {
+            .no-print { display: none; }
+            .print-area { display: block !important; }
+            body { background: white; font-size: 12pt; }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 pb-20">
+
+<div class="bg-blue-800 text-white p-5 text-center shadow-lg">
+    <h1 class="text-2xl font-bold">🥚 KASIR TELUR BUMDES</h1>
+</div>
+
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t flex flex-wrap shadow-[0_-2px_10px_rgba(0,0,0,0.1)] no-print z-50">
+    <button onclick="openTab('kasir')" class="flex-1 p-3 text-sm border-r">Kasir</button>
+    <button onclick="openTab('biaya')" class="flex-1 p-3 text-sm border-r">Biaya</button>
+    <button onclick="openTab('riwayat')" class="flex-1 p-3 text-sm border-r">Riwayat</button>
+    <button onclick="openTab('harian')" class="flex-1 p-3 text-sm border-r">Harian</button>
+    <button onclick="openTab('buku')" class="flex-1 p-3 text-sm border-r">Buku</button>
+    <button onclick="openTab('backup')" class="flex-1 p-3 text-sm border-r">File</button>
+    <button onclick="openTab('reset')" class="flex-1 p-3 text-sm text-red-600">Reset</button>
+</div>
+
+<div class="max-w-4xl mx-auto p-4">
+
+    <div id="tab-kasir" class="tab active space-y-4">
+        <h2 class="text-xl font-bold mb-4">Input Penjualan</h2>
+        <input id="admin" placeholder="Nama Admin" class="border-2 border-blue-200 rounded-lg w-full">
+        <div class="grid grid-cols-2 gap-2">
+            <input id="berat" type="number" step="0.1" placeholder="Berat (Kg)" class="border-2 border-blue-200 rounded-lg w-full" oninput="hitungTotal()">
+            <input id="harga" type="number" placeholder="Harga/Kg (Rp)" class="border-2 border-blue-200 rounded-lg w-full" oninput="hitungTotal()">
+        </div>
+        <div id="totalDisplay" class="bg-yellow-100 border-2 border-yellow-400 p-4 text-center text-2xl font-black rounded-lg text-blue-900">
+            Rp 0
+        </div>
+        <button onclick="simpanTrx()" class="bg-blue-600 hover:bg-blue-700 text-white p-5 w-full rounded-xl shadow-lg transition-all">SIMPAN & CETAK NOTA</button>
+    </div>
+
+    <div id="tab-biaya" class="tab space-y-4">
+        <h2 class="text-xl font-bold mb-4 text-red-700">Input Pengeluaran (Biaya)</h2>
+        <input id="ketBiaya" placeholder="Keterangan Biaya (ex: Pakan, Listrik)" class="border-2 border-red-200 rounded-lg w-full">
+        <input id="jumlahBiaya" type="number" placeholder="Nominal (Rp)" class="border-2 border-red-200 rounded-lg w-full">
+        <button onclick="simpanBiaya()" class="bg-red-600 text-white p-4 w-full rounded-xl shadow">SIMPAN BIAYA</button>
+    </div>
+
+    <div id="tab-riwayat" class="tab space-y-4">
+        <div class="flex flex-col gap-2 mb-4 no-print">
+            <input id="filterAdmin" placeholder="Cari Nama Admin..." onkeyup="loadRiwayat()" class="border p-2 rounded w-full">
+            <button onclick="window.print()" class="bg-green-600 text-white p-3 rounded">Cetak Riwayat</button>
+        </div>
+        <div class="overflow-x-auto print-area">
+            <table class="w-full bg-white text-sm border-collapse border border-gray-300">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border p-2 text-left">Waktu</th>
+                        <th class="border p-2 text-left">Admin</th>
+                        <th class="border p-2 text-right">Detail</th>
+                        <th class="border p-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="listTrx"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-harian" class="tab space-y-4">
+        <div class="no-print">
+            <input type="date" id="tglHarian" class="border-2 border-blue-200 p-3 w-full rounded-lg mb-2" onchange="renderHarian()">
+        </div>
+        <div id="hasilHarian" class="print-area bg-white p-6 border rounded shadow-sm">
+            <p class="text-gray-500 text-center">Pilih tanggal untuk melihat laporan</p>
+        </div>
+        <button onclick="window.print()" class="bg-green-600 text-white p-4 w-full rounded-lg no-print">CETAK LAPORAN</button>
+    </div>
+
+    <div id="tab-buku" class="tab space-y-4">
+        <div class="no-print">
+            <input type="month" id="blnBuku" class="border-2 border-blue-200 p-3 w-full rounded-lg mb-2" onchange="renderBulanan()">
+        </div>
+        <div id="hasilBuku" class="print-area bg-white p-6 border rounded shadow-sm">
+            <p class="text-gray-500 text-center">Pilih bulan untuk melihat pembukuan</p>
+        </div>
+        <button onclick="window.print()" class="bg-green-600 text-white p-4 w-full rounded-lg no-print">CETAK PEMBUKUAN</button>
+    </div>
+
+    <div id="tab-backup" class="tab space-y-6 text-center">
+        <div class="p-6 bg-white rounded-xl shadow">
+            <h3 class="font-bold mb-4">Export Data ke Excel</h3>
+            <button onclick="exportExcel()" class="bg-green-600 text-white p-4 w-full rounded-lg">DOWNLOAD EXCEL</button>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow">
+            <h3 class="font-bold mb-4">Import Data dari Excel</h3>
+            <input type="file" id="fileExcel" class="mb-4 block w-full text-sm text-gray-500">
+            <button onclick="importExcel()" class="bg-blue-600 text-white p-4 w-full rounded-lg">IMPORT EXCEL</button>
+        </div>
+    </div>
+
+    <div id="tab-reset" class="tab text-center p-10">
+        <div class="bg-red-50 p-6 border-2 border-red-200 rounded-2xl">
+            <h2 class="text-xl font-bold text-red-600 mb-4">Zona Bahaya!</h2>
+            <p class="mb-6">Menghapus data akan menghilangkan seluruh riwayat transaksi secara permanen.</p>
+            <button onclick="resetData()" class="bg-red-700 text-white p-5 w-full rounded-xl">HAPUS SEMUA DATA</button>
+        </div>
+    </div>
+
+</div>
+
+<div id="nota" class="print-area hidden fixed top-0 left-0 bg-white p-5 w-full text-sm">
+    <div class="text-center font-bold text-xl mb-2">BUMDES TELUR</div>
+    <hr class="border-black mb-2">
+    <div id="isiNota"></div>
+    <hr class="border-black mt-2 mb-2">
+    <div class="text-center italic">Terima Kasih</div>
+</div>
+
+<script>
+    let transaksi = JSON.parse(localStorage.getItem("trx_telur")) || [];
+    let biaya = JSON.parse(localStorage.getItem("biaya_telur")) || [];
+
+    function openTab(t) {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.getElementById("tab-" + t).classList.add("active");
+        if (t === "riwayat") loadRiwayat();
+        if (t === "harian") renderHarian();
+        if (t === "buku") renderBulanan();
+    }
+
+    function hitungTotal() {
+        const b = document.getElementById('berat').value || 0;
+        const h = document.getElementById('harga').value || 0;
+        document.getElementById('totalDisplay').innerText = "Rp " + (b * h).toLocaleString("id-ID");
+    }
+
+    function simpanTrx() {
+        const b = +document.getElementById('berat').value;
+        const h = +document.getElementById('harga').value;
+        const adm = document.getElementById('admin').value;
+
+        if (!b || !h || !adm) return alert("Mohon lengkapi data!");
+
+        const data = {
+            tgl: new Date().toISOString(),
+            admin: adm,
+            kg: b,
+            harga: h,
+            total: b * h,
+            tipe: 'penjualan'
+        };
+
+        transaksi.push(data);
+        localStorage.setItem("trx_telur", JSON.stringify(transaksi));
+        
+        // Cetak Nota
+        isiNota.innerHTML = `
+            Tgl: ${new Date(data.tgl).toLocaleString("id-ID")}<br>
+            Admin: ${data.admin}<br>
+            --------------------------<br>
+            ${data.kg} kg x Rp ${data.harga.toLocaleString("id-ID")}<br>
+            <b>TOTAL: Rp ${data.total.toLocaleString("id-ID")}</b>
+        `;
+        
+        nota.classList.remove("hidden");
+        window.print();
+        nota.classList.add("hidden");
+
+        // Reset
+        document.getElementById('berat').value = "";
+        document.getElementById('harga').value = "";
+        hitungTotal();
+    }
+
+    function simpanBiaya() {
+        const ket = document.getElementById('ketBiaya').value;
+        const jml = +document.getElementById('jumlahBiaya').value;
+        const adm = document.getElementById('admin').value;
+
+        if (!ket || !jml || !adm) return alert("Lengkapi Ket, Jumlah, dan Nama Admin!");
+
+        const data = {
+            tgl: new Date().toISOString(),
+            admin: adm,
+            keterangan: ket,
+            total: jml,
+            tipe: 'biaya'
+        };
+
+        biaya.push(data);
+        localStorage.setItem("biaya_telur", JSON.stringify(biaya));
+        alert("Biaya berhasil dicatat!");
+        
+        document.getElementById('ketBiaya').value = "";
+        document.getElementById('jumlahBiaya').value = "";
+    }
+
+    function loadRiwayat() {
+        const filter = document.getElementById('filterAdmin').value.toLowerCase();
+        const html = transaksi.slice().reverse()
+            .filter(t => t.admin.toLowerCase().includes(filter))
+            .map(t => `
+                <tr class="border-b">
+                    <td class="p-2">${new Date(t.tgl).toLocaleDateString("id-ID")}</td>
+                    <td class="p-2">${t.admin}</td>
+                    <td class="p-2 text-right">${t.kg}kg @${t.harga.toLocaleString("id-ID")}</td>
+                    <td class="p-2 text-right font-bold text-blue-700">Rp ${t.total.toLocaleString("id-ID")}</td>
+                </tr>
+            `).join("");
+        listTrx.innerHTML = html || "<tr><td colspan='4' class='p-4 text-center'>Tidak ada data</td></tr>";
+    }
+
+    function renderHarian() {
+        const tgl = document.getElementById('tglHarian').value;
+        if (!tgl) return;
+
+        const filteredTrx = transaksi.filter(t => t.tgl.startsWith(tgl));
+        const filteredBiaya = biaya.filter(b => b.tgl.startsWith(tgl));
+
+        const totalJual = filteredTrx.reduce((a, b) => a + b.total, 0);
+        const totalBiaya = filteredBiaya.reduce((a, b) => a + b.total, 0);
+
+        hasilHarian.innerHTML = `
+            <h2 class="text-center font-bold text-xl mb-4">LAPORAN HARIAN (${tgl})</h2>
+            <table class="w-full mb-4">
+                <tr><td>Total Penjualan:</td><td class="text-right font-bold text-green-600">Rp ${totalJual.toLocaleString("id-ID")}</td></tr>
+                <tr><td>Total Biaya:</td><td class="text-right font-bold text-red-600">Rp ${totalBiaya.toLocaleString("id-ID")}</td></tr>
+                <tr class="border-t-2"><td><strong>SALDO BERSIH:</strong></td><td class="text-right font-bold text-blue-700 text-lg">Rp ${(totalJual - totalBiaya).toLocaleString("id-ID")}</td></tr>
+            </table>
+            <p class="text-[10px] text-gray-400">Dicetak pada: ${new Date().toLocaleString()}</p>
+        `;
+    }
+
+    function renderBulanan() {
+        const bln = document.getElementById('blnBuku').value;
+        if (!bln) return;
+
+        const filteredTrx = transaksi.filter(t => t.tgl.startsWith(bln));
+        const filteredBiaya = biaya.filter(b => b.tgl.startsWith(bln));
+
+        const totalJual = filteredTrx.reduce((a, b) => a + b.total, 0);
+        const totalBiaya = filteredBiaya.reduce((a, b) => a + b.total, 0);
+
+        hasilBuku.innerHTML = `
+            <h2 class="text-center font-bold text-xl mb-4">PEMBUKUAN BULANAN (${bln})</h2>
+            <div class="space-y-2">
+                <div class="flex justify-between border-b pb-1"><span>Total Penjualan:</span><span class="font-bold text-green-600">Rp ${totalJual.toLocaleString("id-ID")}</span></div>
+                <div class="flex justify-between border-b pb-1"><span>Total Pengeluaran:</span><span class="font-bold text-red-600">Rp ${totalBiaya.toLocaleString("id-ID")}</span></div>
+                <div class="flex justify-between text-xl font-black mt-4 bg-blue-100 p-2 rounded">
+                    <span>LABA BERSIH:</span>
+                    <span>Rp ${(totalJual - totalBiaya).toLocaleString("id-ID")}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function exportExcel() {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(transaksi), "Penjualan");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(biaya), "Biaya");
+        XLSX.writeFile(wb, "Laporan_BUMDES_" + new Date().toLocaleDateString() + ".xlsx");
+    }
+
+    function importExcel() {
+        const f = fileExcel.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = e => {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+            if (wb.Sheets.Penjualan) {
+                transaksi = XLSX.utils.sheet_to_json(wb.Sheets.Penjualan);
+                localStorage.setItem("trx_telur", JSON.stringify(transaksi));
+            }
+            if (wb.Sheets.Biaya) {
+                biaya = XLSX.utils.sheet_to_json(wb.Sheets.Biaya);
+                localStorage.setItem("biaya_telur", JSON.stringify(biaya));
+            }
+            alert("Data berhasil diimport!");
+            location.reload();
+        };
+        r.readAsArrayBuffer(f);
+    }
+
+    function resetData() {
+        if (confirm("PERINGATAN! Semua data penjualan dan biaya akan dihapus permanen. Lanjutkan?")) {
+            localStorage.removeItem("trx_telur");
+            localStorage.removeItem("biaya_telur");
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
