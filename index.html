@@ -4,44 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUMDes Mandiri - Premium System</title>
+    <title>BUMDes Mandiri - Premium Print</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; padding-bottom: 90px; }
         .tab { display: none; }
         .tab.active { display: block; }
-        
-        /* Desain Card Lebih Elegan */
         .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; }
-        
-        /* Input Lebih Berwibawa */
-        label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-        input { border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px; width: 100%; margin-top: 4px; font-weight: 600; transition: 0.2s; }
-        input:focus { border-color: #2563eb; outline: none; background: #f0f9ff; }
-        
-        /* Navigasi Bawah Yang Kokoh */
-        .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; height: 70px; border-top: 2px solid #f1f5f9; z-index: 1000; }
-        .nav-bot button { flex: 1; font-size: 10px; font-weight: 800; color: #94a3b8; transition: 0.2s; }
-        .nav-bot button.active { color: #2563eb; border-top: 3px solid #2563eb; background: #f8fafc; }
-        
-        /* Tombol Utama */
-        .btn-action { background: #1e293b; color: white; padding: 18px; border-radius: 10px; width: 100%; font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; transition: 0.2s; }
-        .btn-action:active { background: #0f172a; transform: scale(0.98); }
+        input { border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px; width: 100%; margin-top: 4px; font-weight: 600; }
+        input:focus { border-color: #2563eb; outline: none; }
+        .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; height: 75px; border-top: 2px solid #f1f5f9; z-index: 1000; }
+        .nav-bot button { flex: 1; font-size: 10px; font-weight: 800; color: #94a3b8; border-top: 3px solid transparent; }
+        .nav-bot button.active { color: #2563eb; border-top-color: #2563eb; background: #f8fafc; }
+        .btn-utama { background: #1e293b; color: white; padding: 18px; border-radius: 10px; width: 100%; font-weight: 800; font-size: 1.1rem; }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
 <div class="bg-[#1e293b] p-6 text-white rounded-b-3xl shadow-xl mb-6">
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-lg font-extrabold tracking-tighter">BUMDes <span class="text-blue-400">MANDIRI</span></h1>
-            <p id="tglSekarang" class="text-[10px] opacity-50 font-bold uppercase"></p>
+            <h1 class="text-lg font-extrabold text-blue-400">BUMDes MANDIRI</h1>
+            <p class="text-[10px] opacity-50 uppercase tracking-widest font-bold">Sistem Kasir Pro</p>
         </div>
         <div class="text-right bg-white/5 p-3 rounded-xl border border-white/10">
             <p class="text-[9px] font-bold opacity-60 uppercase">Omzet Hari Ini</p>
-            <div id="dashOmzet" class="text-xl font-black text-blue-400">Rp 0</div>
+            <div id="dashOmzet" class="text-xl font-black text-yellow-400">Rp 0</div>
         </div>
     </div>
 </div>
@@ -51,55 +41,44 @@
     <div id="tab-kasir" class="tab active space-y-4">
         <div class="card space-y-4">
             <div>
-                <label>Nama Petugas Admin</label>
+                <label class="text-[11px] font-bold text-slate-400 uppercase">Petugas Admin</label>
                 <input id="admin" placeholder="Nama petugas">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label>Berat (Kg)</label>
+                    <label class="text-[11px] font-bold text-slate-400 uppercase">Berat (Kg)</label>
                     <input id="berat" type="number" step="0.1" placeholder="0.0" oninput="hitung()">
                 </div>
                 <div>
-                    <label>Harga (Rp)</label>
+                    <label class="text-[11px] font-bold text-slate-400 uppercase">Harga (Rp)</label>
                     <input id="harga" type="number" placeholder="25000" oninput="hitung()">
                 </div>
             </div>
         </div>
-        
-        <div class="card bg-blue-50 border-blue-200 text-center">
-            <label class="text-blue-600">Total Pembayaran</label>
+        <div class="card bg-blue-50 border-blue-100 text-center">
+            <label class="text-blue-600 font-bold uppercase text-[10px]">Total Pembayaran</label>
             <div id="totalDisplay" class="text-4xl font-black text-slate-900 mt-1">Rp 0</div>
         </div>
-        
-        <button onclick="simpanTrx()" class="btn-action shadow-lg">SIMPAN & CETAK NOTA</button>
+        <button onclick="simpanTrx()" class="btn-utama">SIMPAN & CETAK NOTA</button>
     </div>
 
     <div id="tab-biaya" class="tab">
         <div class="card border-l-8 border-red-500">
-            <h2 class="font-extrabold text-slate-800 mb-4 uppercase text-sm">Input Pengeluaran</h2>
+            <h2 class="font-bold text-slate-800 mb-4 uppercase text-sm font-black">Catat Pengeluaran</h2>
             <div class="space-y-3">
-                <div>
-                    <label>Keterangan</label>
-                    <input id="ketBiaya" placeholder="Contoh: Pakan Ayam">
-                </div>
-                <div>
-                    <label>Nominal (Rp)</label>
-                    <input id="jmlBiaya" type="number" placeholder="Rp">
-                </div>
-                <button onclick="simpanBiaya()" class="w-full bg-red-600 text-white p-4 rounded-lg font-bold mt-2 shadow-md uppercase text-sm">Simpan Biaya</button>
+                <input id="ketBiaya" placeholder="Keterangan">
+                <input id="jmlBiaya" type="number" placeholder="Nominal Rp">
+                <button onclick="simpanBiaya()" class="w-full bg-red-600 text-white p-4 rounded-lg font-bold uppercase text-sm">Simpan Biaya</button>
             </div>
         </div>
     </div>
 
     <div id="tab-riwayat" class="tab space-y-3">
-        <input id="cariAdmin" placeholder=" Cari transaksi..." onkeyup="renderRiwayat()" class="bg-white border-2">
+        <input id="cariAdmin" placeholder="🔍 Cari transaksi..." onkeyup="renderRiwayat()">
         <div class="card p-0 overflow-hidden">
             <table class="w-full text-sm">
-                <thead class="bg-slate-50 border-b">
-                    <tr class="text-[10px] text-slate-400 uppercase">
-                        <th class="p-4 text-left">Detail Transaksi</th>
-                        <th class="p-4 text-right">Total</th>
-                    </tr>
+                <thead class="bg-slate-50 border-b text-[10px] text-slate-400 uppercase">
+                    <tr><th class="p-4 text-left">Admin/Tgl</th><th class="p-4 text-right">Total</th></tr>
                 </thead>
                 <tbody id="listTrx" class="divide-y"></tbody>
             </table>
@@ -110,30 +89,27 @@
         <div class="card border-t-4 border-slate-900">
             <label>Laporan Harian</label>
             <input type="date" id="tglHarian" onchange="updateLap()" class="mb-3">
-            <div id="vHarian" class="bg-slate-50 p-4 rounded-lg space-y-2 text-sm border font-semibold mb-3"></div>
-            <button onclick="printLaporan()" class="w-full bg-slate-200 text-slate-800 p-3 rounded-lg font-bold text-xs uppercase">Print Laporan Harian</button>
+            <div id="vHarian" class="bg-slate-50 p-4 rounded-lg space-y-1 text-sm border font-bold"></div>
+            <button onclick="printHarian()" class="w-full bg-slate-200 text-slate-700 p-2 rounded mt-2 text-xs font-bold uppercase">Cetak Laporan Harian</button>
         </div>
-
         <div class="card border-t-4 border-blue-600">
             <label>Pembukuan Bulanan</label>
             <input type="month" id="blnBuku" onchange="updateLap()" class="mb-3">
             <div id="vBuku" class="space-y-2 mb-3"></div>
-            <button onclick="printBulanan()" class="w-full bg-blue-100 text-blue-700 p-3 rounded-lg font-bold text-xs uppercase">Print Laporan Bulanan</button>
+            <button onclick="printBulanan()" class="w-full bg-blue-100 text-blue-700 p-2 rounded text-xs font-bold uppercase">Cetak Laporan Bulanan</button>
         </div>
     </div>
 
     <div id="tab-opsi" class="tab space-y-4">
-        <div class="card text-center">
-            <button onclick="exportExcel()" class="w-full bg-green-600 text-white p-4 rounded-lg font-bold mb-6 flex items-center justify-center gap-2">
-                DOWNLOAD EXCEL (BACKUP)
-            </button>
+        <div class="card">
+            <button onclick="exportExcel()" class="w-full bg-green-600 text-white p-4 rounded-lg font-bold mb-6 text-sm uppercase">📥 Download Excel (Backup)</button>
             <div class="pt-5 border-t border-dashed">
-                <label class="block mb-2">Restore / Impor Data</label>
-                <input type="file" id="fileExcel" class="text-xs mb-3 border-none p-0">
-                <button onclick="importExcel()" class="w-full bg-slate-100 text-slate-600 p-3 rounded-lg font-bold text-[10px] uppercase">Gabungkan Data</button>
+                <label class="block mb-2">Import Data</label>
+                <input type="file" id="fileExcel" class="text-xs mb-3">
+                <button onclick="importExcel()" class="w-full bg-slate-100 text-slate-600 p-3 rounded-lg font-bold text-[10px] uppercase">Proses Import Data</button>
             </div>
         </div>
-        <button onclick="resetData()" class="w-full p-4 text-red-400 text-[10px] font-bold uppercase opacity-40">Hapus Semua Data Aplikasi</button>
+        <button onclick="resetData()" class="w-full p-4 text-red-400 text-[10px] font-bold uppercase opacity-30">Hapus Semua Data</button>
     </div>
 
 </div>
@@ -146,17 +122,13 @@
     <button id="n-opsi" onclick="openTab('opsi')">OPSI</button>
 </div>
 
-<iframe id="printFrame" style="display:none"></iframe>
+<div id="printArea" style="display:none;"></div>
 
 <script>
-    // Database Tetap Sama Agar Data Tidak Hilang
     let db_trx = JSON.parse(localStorage.getItem('db_fix_v10_trx')) || [];
     let db_biaya = JSON.parse(localStorage.getItem('db_fix_v10_biaya')) || [];
 
-    window.onload = () => {
-        updateDashboard();
-        document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    };
+    window.onload = updateDashboard;
 
     function openTab(t) {
         document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
@@ -179,15 +151,22 @@
     }
 
     function simpanTrx() {
-        if(!berat.value || !harga.value || !admin.value) return alert("Mohon lengkapi data!");
+        if(!berat.value || !harga.value || !admin.value) return alert("Lengkapi data!");
         const item = { tgl: new Date().toISOString(), adm: admin.value, kg: +berat.value, hrg: +harga.value, total: (+berat.value * +harga.value) };
         db_trx.push(item);
         localStorage.setItem('db_fix_v10_trx', JSON.stringify(db_trx));
 
-        const struk = `<div style="text-align:center; font-family:sans-serif; padding:10px;">
-            <h3>BUMDes MANDIRI</h3>${new Date().toLocaleString()}<br>Petugas: ${item.adm}<br><hr>
-            <b>${item.kg}Kg x Rp ${item.hrg.toLocaleString()}</b><br>
-            <h2 style="margin:10px 0">Rp ${item.total.toLocaleString()}</h2><hr>Terima Kasih</div>`;
+        const struk = `
+            <div style="width:100%; font-family:monospace; padding:20px; text-align:center;">
+                <h2 style="margin:0">BUMDes MANDIRI</h2>
+                <p style="font-size:10px">${new Date().toLocaleString()}</p>
+                <hr>
+                <p>Petugas: ${item.adm}</p>
+                <p>${item.kg}kg x Rp ${item.hrg.toLocaleString()}</p>
+                <h1 style="font-size:24px; margin:10px 0;">Rp ${item.total.toLocaleString()}</h1>
+                <hr>
+                <p>Terima Kasih</p>
+            </div>`;
         
         doPrint(struk);
         berat.value = ""; harga.value = ""; hitung();
@@ -195,19 +174,19 @@
     }
 
     function simpanBiaya() {
-        if(!jmlBiaya.value) return alert("Isi nominal biaya!");
+        if(!jmlBiaya.value) return alert("Isi nominal!");
         db_biaya.push({ tgl: new Date().toISOString(), adm: admin.value || 'Admin', ket: ketBiaya.value, nominal: +jmlBiaya.value });
         localStorage.setItem('db_fix_v10_biaya', JSON.stringify(db_biaya));
-        alert("Pengeluaran disimpan!"); ketBiaya.value = ""; jmlBiaya.value = "";
+        alert("Pengeluaran Dicatat!"); ketBiaya.value = ""; jmlBiaya.value = "";
         updateDashboard();
     }
 
     function renderRiwayat() {
         const f = cariAdmin.value.toLowerCase();
         listTrx.innerHTML = db_trx.slice().reverse().filter(x => x.adm.toLowerCase().includes(f))
-            .map(x => `<tr class="border-b">
-                <td class="p-4 text-xs font-semibold text-slate-700">${x.adm}<br><span class="text-[9px] text-slate-400 font-normal">${x.tgl.slice(0,10)} | ${x.kg}kg</span></td>
-                <td class="p-4 text-right font-bold text-slate-900">Rp ${x.total.toLocaleString()}</td>
+            .map(x => `<tr class="border-b text-xs">
+                <td class="p-4 font-bold text-slate-700">${x.adm}<br><span class="text-[9px] font-normal text-slate-400">${x.tgl.slice(0,10)}</span></td>
+                <td class="p-4 text-right font-black">Rp ${x.total.toLocaleString()}</td>
             </tr>`).join('');
     }
 
@@ -218,38 +197,34 @@
             const h = db_trx.filter(x => x.tgl.startsWith(d));
             const o = h.reduce((a,b)=>a+b.total,0);
             const b = db_biaya.filter(x => x.tgl.startsWith(d)).reduce((a,b)=>a+b.nominal,0);
-            vHarian.innerHTML = `<div class="flex justify-between"><span>Omzet:</span><span>Rp ${o.toLocaleString()}</span></div>
-                                 <div class="flex justify-between text-red-500"><span>Biaya:</span><span>Rp ${b.toLocaleString()}</span></div>
-                                 <div class="flex justify-between border-t mt-1 pt-1 font-bold"><span>Laba:</span><span>Rp ${(o-b).toLocaleString()}</span></div>`;
+            vHarian.innerHTML = `Omzet: Rp ${o.toLocaleString()}<br>Biaya: Rp ${b.toLocaleString()}<br>Laba: Rp ${(o-b).toLocaleString()}`;
         }
         if(m) {
             const bul = db_trx.filter(x => x.tgl.startsWith(m));
             const oM = bul.reduce((a,b)=>a+b.total,0);
             const bM = db_biaya.filter(x => x.tgl.startsWith(m)).reduce((a,b)=>a+b.nominal,0);
             vBuku.innerHTML = `<div class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm font-bold">
-                <div class="flex justify-between mb-1"><span>Omzet:</span><span>Rp ${oM.toLocaleString()}</span></div>
-                <div class="flex justify-between text-red-600 mb-1"><span>Biaya:</span><span>Rp ${bM.toLocaleString()}</span></div>
-                <div class="flex justify-between text-lg text-blue-700 border-t pt-2"><span>Laba Bersih:</span><span>Rp ${(oM-bM).toLocaleString()}</span></div>
-            </div>`;
+                Omzet: Rp ${oM.toLocaleString()}<br>Biaya: Rp ${bM.toLocaleString()}<br>Laba: Rp ${(oM-bM).toLocaleString()}</div>`;
         }
     }
 
-    function printLaporan() { if(vHarian.innerHTML) doPrint(`<h3>LAPORAN HARIAN</h3>` + vHarian.innerHTML); }
+    function printHarian() { if(vHarian.innerHTML) doPrint(`<h3>LAPORAN HARIAN</h3>` + vHarian.innerHTML); }
     function printBulanan() { if(vBuku.innerHTML) doPrint(`<h3>LAPORAN BULANAN</h3>` + vBuku.innerHTML); }
 
+    // FUNGSI PRINT VERSI STABIL (DIRECT WINDOW PRINT)
     function doPrint(html) {
-        const pFrame = document.getElementById('printFrame');
-        const pDoc = pFrame.contentWindow.document;
-        pDoc.open();
-        pDoc.write(`<html><head><style>body{font-family:sans-serif;font-size:12px;}</style></head><body onload="window.print()">${html}</body></html>`);
-        pDoc.close();
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`<html><head><title>Print</title><style>body{font-family:monospace;}</style></head><body>${html}</body></html>`);
+        printWindow.document.close();
+        printWindow.print();
+        setTimeout(() => { printWindow.close(); }, 500);
     }
 
     function exportExcel() {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_trx), "Transaksi");
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_biaya), "Biaya");
-        XLSX.writeFile(wb, "Backup_BUMDes_Mandiri.xlsx");
+        XLSX.writeFile(wb, "Backup_BUMDes.xlsx");
     }
 
     function importExcel() {
@@ -262,12 +237,14 @@
             db_biaya = XLSX.utils.sheet_to_json(wb.Sheets.Biaya);
             localStorage.setItem('db_fix_v10_trx', JSON.stringify(db_trx));
             localStorage.setItem('db_fix_v10_biaya', JSON.stringify(db_biaya));
-            alert("Data berhasil digabungkan!"); location.reload();
+            location.reload();
         };
         r.readAsArrayBuffer(f);
     }
 
-    function resetData() { if(confirm("Hapus semua data permanen?")) { localStorage.clear(); location.reload(); } }
+    function resetData() { if(confirm("Hapus semua?")) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
 </html>
+
+
