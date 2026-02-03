@@ -3,122 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUMDes Mandiri - Versi Final Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>BUMDes MANDIRI - Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; padding-bottom: 90px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        body { background-color: #f1f5f9; padding-bottom: 90px; }
+        .app-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .tab { display: none; }
         .tab.active { display: block; }
-        .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; height: 75px; border-top: 1px solid #e2e8f0; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #64748b; border: none; background: none; }
-        .nav-item.active { color: #2563eb; border-top: 3px solid #2563eb; }
-        input { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; width: 100%; font-weight: 600; margin-top: 4px; }
-        label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-
-        /* FIX PRINT ANDROID: Konten aplikasi disembunyikan total saat print */
-        @media print {
-            .no-print { display: none !important; }
-            #print-area { display: block !important; width: 100%; background: white; }
-        }
-        #print-area { display: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; border-top: 1px solid #ddd; height: 75px; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #666; border: none; background: none; }
+        .nav-item.active { color: #2563eb; }
     </style>
 </head>
 <body>
 
-<div class="no-print">
-    <div class="bg-[#0f172a] p-6 text-white rounded-b-[25px] mb-4 shadow-xl">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black text-blue-400">BUMDes MANDIRI</h1>
-                <p id="tgl-skrg" class="text-[10px] opacity-70 font-bold uppercase"></p>
-            </div>
-            <div class="text-right">
-                <p class="text-[9px] opacity-60 font-bold uppercase text-blue-200">Saldo Bersih</p>
-                <h5 id="dash-omzet" class="text-xl font-black text-yellow-400">Rp 0</h5>
-            </div>
+<div class="p-3">
+    <div class="bg-dark text-white p-4 rounded-4 mb-4 shadow">
+        <h4 class="fw-black mb-0 text-info">BUMDes MANDIRI</h4>
+        <small id="tgl-info"></small>
+        <hr class="opacity-25">
+        <div class="d-flex justify-content-between">
+            <small>Saldo Bersih:</small>
+            <h5 id="dash-saldo" class="text-warning fw-bold">Rp 0</h5>
         </div>
     </div>
 
-    <div class="container mx-auto px-4">
-        <div id="tab-kasir" class="tab active space-y-4">
-            <div class="card space-y-3">
-                <div><label>Nama Admin</label><input type="text" id="admin" placeholder="Nama Petugas"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label>Berat (Kg)</label><input type="number" id="berat" step="0.1" placeholder="0.0" oninput="hitung()"></div>
-                    <div><label>Harga (Rp)</label><input type="number" id="harga" placeholder="25000" oninput="hitung()"></div>
+    <div id="tab-kasir" class="tab active">
+        <div class="app-card">
+            <label class="small fw-bold text-muted">NAMA ADMIN</label>
+            <input type="text" id="admin" class="form-control mb-2" placeholder="Petugas">
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="small fw-bold text-muted">BERAT (KG)</label>
+                    <input type="number" id="berat" class="form-control" placeholder="0.0" oninput="hitung()">
+                </div>
+                <div class="col-6">
+                    <label class="small fw-bold text-muted">HARGA (RP)</label>
+                    <input type="number" id="harga" class="form-control" placeholder="25000" oninput="hitung()">
                 </div>
             </div>
-            <div class="card bg-blue-600 text-center py-5 shadow-lg">
-                <p class="text-[10px] font-bold text-blue-100 uppercase">Total Pembayaran</p>
-                <h2 id="total-display" class="text-4xl font-black text-white">Rp 0</h2>
-            </div>
-            <button onclick="simpanDanCetak()" class="w-full bg-[#0f172a] text-white py-4 rounded-xl font-black text-lg shadow-lg">SIMPAN & CETAK NOTA</button>
         </div>
-
-        <div id="tab-biaya" class="tab space-y-4">
-            <div class="card border-l-8 border-red-500">
-                <h6 class="font-bold text-red-600 text-xs mb-3 uppercase">Input Pengeluaran</h6>
-                <input type="text" id="ket-biaya" placeholder="Keterangan">
-                <input type="number" id="nom-biaya" placeholder="Nominal Rp" class="mt-2">
-                <button onclick="simpanBiaya()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold mt-3">SIMPAN BIAYA</button>
-            </div>
-            <h6 class="font-black text-slate-800 text-xs uppercase px-1">Daftar Pengeluaran</h6>
-            <div id="list-biaya-full" class="space-y-2"></div>
+        <div class="app-card bg-primary text-white text-center">
+            <small class="opacity-75">TOTAL BAYAR</small>
+            <h2 id="total-display" class="fw-black">Rp 0</h2>
         </div>
+        <button onclick="simpanTrx()" class="btn btn-dark w-100 py-3 fw-bold shadow">SIMPAN & CETAK NOTA</button>
+    </div>
 
-        <div id="tab-riwayat" class="tab space-y-3">
-            <h6 class="font-black text-slate-800 text-xs uppercase px-1">Riwayat Transaksi Lengkap</h6>
-            <div id="list-riwayat" class="space-y-2 pb-5"></div>
+    <div id="tab-biaya" class="tab">
+        <div class="app-card border-start border-danger border-4">
+            <h6 class="fw-bold text-danger">INPUT PENGELUARAN</h6>
+            <input type="text" id="ket-biaya" class="form-control mb-2" placeholder="Keterangan">
+            <input type="number" id="nom-biaya" class="form-control mb-3" placeholder="Nominal Rp">
+            <button onclick="simpanBiaya()" class="btn btn-danger w-100 fw-bold">SIMPAN BIAYA</button>
         </div>
+        <h6 class="fw-bold small text-muted px-2">DAFTAR PENGELUARAN</h6>
+        <div id="list-biaya-full"></div>
+    </div>
 
-        <div id="tab-laporan" class="tab space-y-4">
-            <div class="card border-t-4 border-slate-900">
-                <h6 class="font-bold text-xs mb-2">LAPORAN HARIAN</h6>
-                <input type="date" id="tgl-lap" onchange="updateLaporan()">
-                <div id="res-harian" class="my-3 p-3 bg-slate-50 rounded font-bold text-sm">Pilih Tanggal</div>
-                <button onclick="cetakLaporan('Harian')" class="w-full bg-slate-800 text-white py-3 rounded-lg font-bold text-[10px]">CETAK HARIAN</button>
-            </div>
-            <div class="card border-t-4 border-blue-600">
-                <h6 class="font-bold text-xs mb-2 text-blue-600">LAPORAN BULANAN</h6>
-                <input type="month" id="bln-lap" onchange="updateLaporan()">
-                <div id="res-bulanan" class="my-3 p-3 bg-blue-50 rounded font-bold text-sm text-blue-800">Pilih Bulan</div>
-                <button onclick="cetakLaporan('Bulanan')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-[10px]">CETAK BULANAN</button>
-            </div>
+    <div id="tab-riwayat" class="tab">
+        <h6 class="fw-bold small text-muted px-2">RIWAYAT TRANSAKSI</h6>
+        <div id="list-riwayat"></div>
+    </div>
+
+    <div id="tab-laporan" class="tab">
+        <div class="app-card border-top border-dark border-4">
+            <h6 class="fw-bold">LAPORAN HARIAN</h6>
+            <input type="date" id="tgl-lap" class="form-control mb-2" onchange="updateLaporan()">
+            <div id="res-harian" class="p-2 bg-light rounded small fw-bold my-2">Pilih Tanggal</div>
+            <button onclick="cetakLap('Harian')" class="btn btn-dark btn-sm w-100">CETAK HARIAN</button>
         </div>
-
-        <div id="tab-opsi" class="tab space-y-4">
-            <div class="card">
-                <button onclick="exportExcel()" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold mb-6">BACKUP KE EXCEL</button>
-                <div class="border-t border-dashed pt-4">
-                    <p class="text-[10px] font-bold text-center text-slate-400 mb-2 uppercase">Import / Restore Data</p>
-                    <input type="file" id="file-import" class="text-[10px] mb-3">
-                    <button onclick="importExcel()" class="w-full bg-slate-100 text-slate-600 py-3 rounded font-bold text-[10px]">PROSES IMPORT DATA</button>
-                </div>
-            </div>
-            <button onclick="resetData()" class="w-full text-red-400 text-[9px] font-bold uppercase opacity-30 mt-10">Reset Database</button>
+        <div class="app-card border-top border-primary border-4">
+            <h6 class="fw-bold">LAPORAN BULANAN</h6>
+            <input type="month" id="bln-lap" class="form-control mb-2" onchange="updateLaporan()">
+            <div id="res-bulanan" class="p-2 bg-light rounded small fw-bold my-2 text-primary">Pilih Bulan</div>
+            <button onclick="cetakLap('Bulanan')" class="btn btn-primary btn-sm w-100">CETAK BULANAN</button>
         </div>
     </div>
 
-    <nav class="nav-bot">
-        <button class="nav-item active" onclick="nav('kasir', this)"><span>🛒</span>KASIR</button>
-        <button class="nav-item" onclick="nav('biaya', this)"><span>💸</span>BIAYA</button>
-        <button class="nav-item" onclick="nav('riwayat', this)"><span>📋</span>RIWAYAT</button>
-        <button class="nav-item" onclick="nav('laporan', this)"><span>📊</span>LAPORAN</button>
-        <button class="nav-item" onclick="nav('opsi', this)"><span>⚙️</span>OPSI</button>
-    </nav>
+    <div id="tab-opsi" class="tab">
+        <div class="app-card text-center">
+            <button onclick="exportExcel()" class="btn btn-success w-100 py-3 fw-bold mb-4">BACKUP KE EXCEL</button>
+            <div class="border-top pt-3 border-secondary border-dashed">
+                <p class="small fw-bold text-muted">RESTORE / IMPORT DATA</p>
+                <input type="file" id="file-import" class="form-control mb-2">
+                <button onclick="importExcel()" class="btn btn-outline-secondary btn-sm w-100 fw-bold">PROSES IMPORT DATA</button>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <button onclick="resetData()" class="btn btn-link text-danger text-decoration-none fw-bold small opacity-25">RESET SEMUA DATA</button>
+        </div>
+    </div>
 </div>
 
-<div id="print-area"></div>
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="nav('kasir', this)">🛒 KASIR</button>
+    <button class="nav-item" onclick="nav('biaya', this)">💸 BIAYA</button>
+    <button class="nav-item" onclick="nav('riwayat', this)">📋 RIWAYAT</button>
+    <button class="nav-item" onclick="nav('laporan', this)">📊 LAPORAN</button>
+    <button class="nav-item" onclick="nav('opsi', this)">⚙️ OPSI</button>
+</nav>
 
 <script>
-    let db_trx = JSON.parse(localStorage.getItem('db_final_trx')) || [];
-    let db_biaya = JSON.parse(localStorage.getItem('db_final_biaya')) || [];
+    let db_trx = JSON.parse(localStorage.getItem('db_v20_trx')) || [];
+    let db_biaya = JSON.parse(localStorage.getItem('db_v20_biaya')) || [];
 
     window.onload = () => {
-        document.getElementById('tgl-skrg').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        document.getElementById('tgl-info').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
         updateDashboard();
         renderBiaya();
     };
@@ -129,57 +121,61 @@
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         if(s === 'riwayat') renderRiwayat();
-        if(s === 'biaya') renderBiaya();
     }
 
     function hitung() {
         const t = (Number(document.getElementById('berat').value) || 0) * (Number(document.getElementById('harga').value) || 0);
-        document.getElementById('total-display').innerText = "Rp " + t.toLocaleString('id-ID');
+        document.getElementById('total-display').innerText = "Rp " + t.toLocaleString();
     }
 
     function updateDashboard() {
         const h = new Date().toISOString().slice(0,10);
         const o = db_trx.filter(x => x.tgl.startsWith(h)).reduce((a,b) => a + b.total, 0);
         const b = db_biaya.filter(x => x.tgl.startsWith(h)).reduce((a,b) => a + b.nominal, 0);
-        document.getElementById('dash-omzet').innerText = "Rp " + (o - b).toLocaleString('id-ID');
+        document.getElementById('dash-saldo').innerText = "Rp " + (o - b).toLocaleString();
     }
 
-    // FUNGSI PRINT FINAL: Langsung panggil menu printer Android
-    function triggerAndroidPrint(html) {
-        const area = document.getElementById('print-area');
-        area.innerHTML = `
-            <div style="font-family:monospace; text-align:center; padding:20px;">
-                <h2 style="margin:0">BUMDes MANDIRI</h2>
-                <small>${new Date().toLocaleString()}</small><hr style="border-top:1px dashed #000">
-                ${html}
-                <hr style="border-top:1px dashed #000">
-                <p>Terima Kasih</p>
-            </div>
-        `;
-        // Delay sedikit agar konten terisi lalu panggil printer
-        setTimeout(() => { window.print(); }, 500);
+    // --- LOGIKA PRINT PERSIS RT 05 ---
+    function panggilCetak(judul, konten) {
+        let p = window.open('', '_blank');
+        p.document.write(`
+            <html><head><title>${judul}</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            </head><body class="p-4 text-center">
+                <div class="d-print-none mb-4">
+                    <button class="btn btn-primary btn-lg w-100 p-3 fw-bold shadow" onclick="window.print()">KLIK TOMBOL BIRU INI UNTUK CETAK</button>
+                    <p class="mt-2 small text-muted">Jika tombol tidak bereaksi, pastikan fitur Print di setting WebIntoApp sudah aktif.</p>
+                </div>
+                <div class="text-center">
+                    <h4>BUMDes MANDIRI</h4>
+                    <p class="small">${new Date().toLocaleString()}</p><hr>
+                    ${konten}
+                    <hr><p class="small">Terima Kasih</p>
+                </div>
+            </body></html>
+        `);
+        p.document.close();
     }
 
-    function simpanDanCetak() {
+    function simpanTrx() {
         const adm = document.getElementById('admin').value;
         const kg = Number(document.getElementById('berat').value);
         const hrg = Number(document.getElementById('harga').value);
-        if(!adm || !kg) return alert("Mohon lengkapi Admin & Berat!");
+        if(!adm || !kg) return alert("Isi Data!");
 
         const item = { id: Date.now(), tgl: new Date().toISOString(), adm, kg, hrg, total: kg * hrg };
         db_trx.push(item);
-        localStorage.setItem('db_final_trx', JSON.stringify(db_trx));
+        localStorage.setItem('db_v20_trx', JSON.stringify(db_trx));
 
         const nota = `
-            <div style="text-align:left; margin:15px 0;">
-                <p><b>Admin:</b> ${item.adm}</p>
-                <p><b>Rincian:</b> ${item.kg} Kg x Rp ${item.hrg.toLocaleString()}</p>
-                <h3 style="text-align:center; margin-top:20px;">TOTAL: Rp ${item.total.toLocaleString()}</h3>
+            <div class="text-start d-inline-block w-100">
+                <p class="mb-1"><b>Admin:</b> ${item.adm}</p>
+                <p class="mb-1"><b>Rincian:</b> ${item.kg} Kg x Rp ${item.hrg.toLocaleString()}</p>
             </div>
+            <h2 class="my-4">TOTAL: Rp ${item.total.toLocaleString()}</h2>
         `;
-        triggerAndroidPrint(nota);
-        document.getElementById('berat').value = ""; hitung();
-        updateDashboard();
+        panggilCetak("Nota Transaksi", nota);
+        document.getElementById('berat').value = ""; hitung(); updateDashboard();
     }
 
     function simpanBiaya() {
@@ -187,34 +183,31 @@
         const nom = Number(document.getElementById('nom-biaya').value);
         if(!nom) return alert("Isi nominal!");
         db_biaya.push({ id: Date.now(), tgl: new Date().toISOString(), ket, nominal: nom });
-        localStorage.setItem('db_final_biaya', JSON.stringify(db_biaya));
+        localStorage.setItem('db_v20_biaya', JSON.stringify(db_biaya));
         document.getElementById('ket-biaya').value = ""; document.getElementById('nom-biaya').value = "";
         renderBiaya(); updateDashboard();
     }
 
     function renderBiaya() {
         document.getElementById('list-biaya-full').innerHTML = db_biaya.slice().reverse().map(b => `
-            <div class="card flex justify-between items-center py-3 border-r-4 border-red-500 mb-2">
-                <div><b class="text-xs uppercase">${b.ket}</b><br><small class="text-slate-400 text-[9px]">${b.tgl.slice(0,10)}</small></div>
-                <b class="text-red-600">Rp ${b.nominal.toLocaleString()}</b>
-            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-5">Belum ada pengeluaran</p>';
+            <div class="app-card d-flex justify-content-between align-items-center py-2 border-end border-danger border-4">
+                <div><b class="text-uppercase small">${b.ket}</b><br><small class="text-muted">${b.tgl.slice(0,10)}</small></div>
+                <b class="text-danger">Rp ${b.nominal.toLocaleString()}</b>
+            </div>`).join('') || '<p class="text-center small py-3">Belum ada pengeluaran</p>';
     }
 
     function renderRiwayat() {
         document.getElementById('list-riwayat').innerHTML = db_trx.slice().reverse().map(x => `
-            <div class="card mb-2">
-                <div class="flex justify-between items-start border-b pb-2">
-                    <div>
-                        <b class="text-sm uppercase">${x.adm}</b>
-                        <p class="text-[10px] text-slate-400">${x.tgl.replace('T',' ').slice(0,16)}</p>
-                    </div>
-                    <b class="text-blue-600">Rp ${x.total.toLocaleString()}</b>
+            <div class="app-card border-bottom">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                    <div><b class="text-uppercase small text-dark">${x.adm}</b><br><small class="text-muted">${x.tgl.replace('T',' ').slice(0,16)}</small></div>
+                    <b class="text-primary">Rp ${x.total.toLocaleString()}</b>
                 </div>
-                <div class="flex justify-between text-[11px] font-bold text-slate-500 mt-1">
+                <div class="d-flex justify-content-between small fw-bold text-secondary">
                     <span>${x.kg} Kg</span>
                     <span>@ Rp ${x.hrg.toLocaleString()}</span>
                 </div>
-            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Belum ada transaksi</p>';
+            </div>`).join('') || '<p class="text-center small py-5">Kosong</p>';
     }
 
     function updateLaporan() {
@@ -232,43 +225,35 @@
         }
     }
 
-    function cetakLaporan(tipe) {
+    function cetakLap(tipe) {
         const isi = (tipe === 'Harian') ? document.getElementById('res-harian').innerHTML : document.getElementById('res-bulanan').innerHTML;
         if(!isi || isi.includes("Pilih")) return alert("Pilih data!");
-        triggerAndroidPrint(`<h4>LAPORAN ${tipe.toUpperCase()}</h4><br>${isi}`);
+        panggilCetak("Laporan "+tipe, `<h5 class="mb-3">LAPORAN ${tipe.toUpperCase()}</h5>${isi}`);
     }
 
     function exportExcel() {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_trx), "Transaksi");
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_biaya), "Biaya");
-        XLSX.writeFile(wb, "Backup_BUMDes.xlsx");
+        XLSX.writeFile(wb, "BUMDes_Mandiri.xlsx");
     }
 
     function importExcel() {
         const f = document.getElementById('file-import').files[0];
-        if(!f) return alert("Pilih file excel dulu!");
+        if(!f) return alert("Pilih file!");
         const r = new FileReader();
         r.onload = (e) => {
-            try {
-                const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const dataTrx = XLSX.utils.sheet_to_json(wb.Sheets.Transaksi);
-                const dataBiaya = XLSX.utils.sheet_to_json(wb.Sheets.Biaya);
-                if(dataTrx) {
-                    db_trx = dataTrx;
-                    db_biaya = dataBiaya || [];
-                    localStorage.setItem('db_final_trx', JSON.stringify(db_trx));
-                    localStorage.setItem('db_final_biaya', JSON.stringify(db_biaya));
-                    alert("Data Berhasil Diimport!"); location.reload();
-                }
-            } catch(err) { alert("File tidak sesuai!"); }
+            const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+            db_trx = XLSX.utils.sheet_to_json(wb.Sheets.Transaksi) || [];
+            db_biaya = XLSX.utils.sheet_to_json(wb.Sheets.Biaya) || [];
+            localStorage.setItem('db_v20_trx', JSON.stringify(db_trx));
+            localStorage.setItem('db_v20_biaya', JSON.stringify(db_biaya));
+            alert("Data Berhasil Dimuat!"); location.reload();
         };
         r.readAsArrayBuffer(f);
     }
 
-    function resetData() { if(confirm("Hapus semua data?")) { localStorage.clear(); location.reload(); } }
+    function resetData() { if(confirm("Hapus semua?")) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
 </html>
-
-
