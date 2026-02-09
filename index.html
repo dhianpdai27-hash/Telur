@@ -3,62 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Penjualan Telur – Bumdes Campurejo Sukses Mandiri</title>
+  <title>Sistem Penjualan Telur – Bumdes Campurejo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
   
   <style>
-    /* 1. KUNCI PERBAIKAN PRINT (AUTO HEIGHT) */
-    @media print {
-      body * { visibility: hidden !important; }
-      #printArea, #printArea * { visibility: visible !important; }
-      
-      #printArea { 
-        position: absolute; 
-        top: 0; 
-        left: 0; 
-        width: 58mm; /* Lebar statis */
-        height: auto; /* Tinggi otomatis sesuai isi */
-        display: block !important;
-        margin: 0;
-        padding: 0;
-      }
-
-      @page { 
-        margin: 0; 
-        size: 58mm auto; /* Memaksa browser menyesuaikan tinggi kertas */
-      }
-
-      /* Menghilangkan header/footer tanggal & URL browser */
-      html, body {
-        height: auto;
-        margin: 0 !important; 
-        padding: 0 !important;
-        overflow: hidden;
-      }
-    }
-
-    /* 2. STYLE NOTA ELEGAN (SESUAI REQUEST SEBELUMNYA) */
-    .receipt-wrapper { 
-      width: 58mm; 
-      padding: 8px; 
-      background-color: #FFFDF2; 
-      font-family: 'Segoe UI', Arial, sans-serif; 
-      color: #333;
-      box-sizing: border-box;
-    }
-    .receipt-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 8px; }
-    .receipt-header h2 { font-size: 11pt; font-weight: bold; margin: 0; line-height: 1.1; }
-    .receipt-header p { font-size: 8pt; margin: 0; }
-    .receipt-info { font-size: 8.5pt; margin-bottom: 8px; }
-    .info-line { display: flex; justify-content: space-between; margin-bottom: 1px; }
-    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-    .receipt-table th { background-color: #FEF3C7; font-size: 8pt; padding: 4px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-    .receipt-table td { padding: 5px 2px; font-size: 8.5pt; border-bottom: 1px solid #eee; }
-    .receipt-total { background-color: #FEF3C7; padding: 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fcd34d; }
-    .receipt-footer { text-align: center; margin-top: 10px; font-size: 7.5pt; color: #666; font-style: italic; }
-
-    #printArea { display: none; }
     .tab-content { display: none; }
     .active-tab { display: block; }
   </style>
@@ -86,12 +36,12 @@
         <input id="customerName" required placeholder="Nama Pembeli" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition">
         <input id="staffName" required placeholder="Petugas" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition">
         <input id="eggWeight" type="number" step="0.01" required placeholder="Berat (kg)" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition font-bold text-lg">
-        <input id="pricePerKg" type="number" required placeholder="Harga per kg (Manual)" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition font-bold text-lg">
+        <input id="pricePerKg" type="number" required placeholder="Harga per kg" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition font-bold text-lg">
         <div class="md:col-span-2 bg-green-50 p-6 rounded-2xl border-2 border-green-100 text-center">
             <span class="text-xs font-bold text-green-600 uppercase block mb-1 tracking-widest">Total Bayar</span>
             <input id="totalAmount" readonly class="bg-transparent text-4xl font-black text-green-700 text-center w-full outline-none">
         </div>
-        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg shadow-green-200 transition-all active:scale-95">💾 SIMPAN & CETAK NOTA</button>
+        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg shadow-green-200 transition-all active:scale-95">💾 SIMPAN & CETAK STRUK</button>
       </form>
     </div>
   </div>
@@ -118,43 +68,55 @@
 
   <div id="laporan" class="tab-content">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500">
-            <h3 class="font-bold mb-4">Laporan Mingguan</h3>
-            <button onclick="printLaporan('mingguan')" class="w-full bg-purple-600 text-white p-3 rounded-xl font-bold hover:bg-purple-700 transition">📄 Cetak Mingguan</button>
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-green-500">
+            <h3 class="font-bold mb-4 text-gray-700">Laporan Harian</h3>
+            <input type="date" id="reportDate" class="w-full border p-2 mb-3 rounded-lg outline-none">
+            <button onclick="generatePDF('harian')" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold">📄 Download PDF</button>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
-            <h3 class="font-bold mb-4">Laporan Bulanan</h3>
-            <button onclick="printLaporan('bulanan')" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold hover:bg-blue-700 transition">📄 Cetak Bulanan</button>
+            <h3 class="font-bold mb-4 text-gray-700">Laporan Mingguan</h3>
+            <button onclick="generatePDF('mingguan')" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold">📄 Download PDF</button>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-gray-700">
-            <h3 class="font-bold mb-4">Laporan Harian</h3>
-            <input type="date" id="reportDate" class="w-full border p-2 mb-3 rounded-lg outline-none">
-            <button onclick="printLaporan('harian')" class="w-full bg-gray-800 text-white p-3 rounded-xl font-bold hover:bg-black transition">📄 Cetak Harian</button>
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500">
+            <h3 class="font-bold mb-4 text-gray-700">Laporan Bulanan</h3>
+            <button onclick="generatePDF('bulanan')" class="w-full bg-purple-600 text-white p-3 rounded-xl font-bold">📄 Download PDF</button>
         </div>
     </div>
   </div>
 
   <div id="pengaturan" class="tab-content">
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md mx-auto">
-      <h2 class="text-lg font-bold mb-6 text-center">⚙️ Pengaturan Sistem</h2>
+      <h2 class="text-lg font-bold mb-6 text-center text-gray-700 border-b pb-2">⚙️ Manajemen Data</h2>
+      
       <div class="space-y-4">
-          <button onclick="exportData()" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-xl font-bold transition flex items-center justify-center gap-2">📤 Export Backup Data</button>
-          <div class="border-2 border-dashed border-gray-200 p-6 rounded-2xl text-center">
-              <p class="text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest">Import Data Transaksi</p>
-              <input type="file" id="importFile" onchange="importData(event)" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+          <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Salin Data (Backup)</label>
+              <button onclick="exportData()" class="w-full mt-1 bg-blue-500 text-white p-3 rounded-xl font-bold hover:bg-blue-600 transition">📤 Backup ke File .json</button>
           </div>
-          <button onclick="resetData()" class="w-full bg-red-100 hover:bg-red-600 text-red-600 hover:text-white p-3 rounded-xl font-bold transition">⚠️ Reset Semua Data</button>
+
+          <hr>
+
+          <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Masukkan Data (Import)</label>
+              <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+              <button onclick="document.getElementById('importFile').click()" class="w-full mt-1 bg-orange-500 text-white p-3 rounded-xl font-bold hover:bg-orange-600 transition">📥 Pilih File Backup</button>
+          </div>
+
+          <hr>
+
+          <div>
+              <label class="text-xs font-bold text-gray-400 uppercase">Hapus Permanen</label>
+              <button onclick="resetData()" class="w-full mt-1 bg-red-50 text-red-600 p-3 rounded-xl font-bold hover:bg-red-100 transition">⚠️ Kosongkan Semua Data</button>
+          </div>
       </div>
     </div>
   </div>
 </div>
 
-<div id="printArea"></div>
-
 <script>
 let transactions = JSON.parse(localStorage.getItem('eggTransactions')) || [];
-let lastTransaction = null;
 
+// HITUNG TOTAL OTOMATIS
 const weightInput = document.getElementById('eggWeight');
 const priceInput = document.getElementById('pricePerKg');
 const totalInput = document.getElementById('totalAmount');
@@ -167,14 +129,15 @@ const totalInput = document.getElementById('totalAmount');
     });
 });
 
+// SIMPAN & CETAK
 document.getElementById('salesForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const now = new Date();
   const trx = {
     id: Date.now(),
-    notaNo: 'INV' + now.getFullYear().toString().substr(-2) + Math.floor(1000 + Math.random() * 9000),
+    notaNo: 'INV' + Math.floor(1000 + Math.random() * 8999),
     date: now.toLocaleDateString('id-ID'),
-    isoDate: now.toISOString(),
+    isoDate: now.toISOString().split('T')[0],
     time: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
     customer: document.getElementById('customerName').value,
     staff: document.getElementById('staffName').value,
@@ -184,8 +147,7 @@ document.getElementById('salesForm').addEventListener('submit', (e) => {
   };
   transactions.push(trx);
   localStorage.setItem('eggTransactions', JSON.stringify(transactions));
-  lastTransaction = trx;
-  reprintNota(trx); // Langsung print setelah simpan
+  printRawBT(trx); 
   e.target.reset();
   totalInput.value = '';
 });
@@ -201,143 +163,124 @@ function updateHistoryTable() {
     tbody.innerHTML = '';
     transactions.slice().reverse().forEach(t => {
         tbody.innerHTML += `
-            <tr class="hover:bg-gray-50 transition">
-                <td class="p-4 border-b text-[11px]">${t.date} ${t.time}</td>
-                <td class="p-4 border-b font-bold text-gray-700">${t.customer}</td>
-                <td class="p-4 border-b text-gray-600">${t.weight} kg</td>
-                <td class="p-4 border-b font-black text-green-700">Rp ${t.total.toLocaleString('id-ID')}</td>
-                <td class="p-4 border-b text-center">
-                    <button onclick='reprintNota(${JSON.stringify(t)})' class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition">CETAK</button>
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="p-4 text-[11px]">${t.date} ${t.time}</td>
+                <td class="p-4 font-bold">${t.customer}</td>
+                <td class="p-4">${t.weight} kg</td>
+                <td class="p-4 font-black text-green-700">Rp ${t.total.toLocaleString('id-ID')}</td>
+                <td class="p-4 text-center">
+                    <button onclick='printRawBT(${JSON.stringify(t)})' class="bg-blue-600 text-white px-3 py-1 rounded text-[10px] font-bold uppercase">Cetak</button>
                 </td>
             </tr>
         `;
     });
 }
 
-// FUNGSI PRINT NOTA DENGAN TINGGI OTOMATIS
-function reprintNota(t) {
-  const printArea = document.getElementById('printArea');
-  printArea.innerHTML = `
-    <div class="receipt-wrapper">
-      <div class="receipt-header">
-        <h2>BUMDES CAMPUREJO</h2>
-        <p>SUKSES MANDIRI</p>
-        <p style="font-size: 7pt; margin-top: 2px;">Peternakan Ayam Petelur</p>
-      </div>
-
-      <div class="receipt-info">
-        <div class="info-line"><span>No:</span><b>#${t.notaNo}</b></div>
-        <div class="info-line"><span>Tgl:</span><b>${t.date} ${t.time}</b></div>
-        <div class="info-line"><span>Plgn:</span><b>${t.customer}</b></div>
-        <div class="info-line"><span>Ksr:</span><b>${t.staff}</b></div>
-      </div>
-
-      <table class="receipt-table">
-        <thead>
-          <tr>
-            <th align="left">Item</th>
-            <th align="center">Berat</th>
-            <th align="right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Telur Ayam</td>
-            <td align="center">${t.weight} kg</td>
-            <td align="right">${t.total.toLocaleString('id-ID')}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="receipt-total">
-        <b style="font-size: 9pt">TOTAL</b>
-        <b style="font-size: 11pt">Rp ${t.total.toLocaleString('id-ID')}</b>
-      </div>
-
-      <div class="receipt-footer">
-        Terima kasih atas kepercayaan Anda.<br>
-        Telur segar berkualitas tinggi.<br><br>
-        🥚 BUMDES CAMPUREJO 🥚
-      </div>
-    </div>
-  `;
-  window.print();
+// CETAK RAWBT
+function printRawBT(t) {
+    let struk = 
+        "------------------------------\n" +
+        "       BUMDES CAMPUREJO       \n" +
+        "        SUKSES MANDIRI        \n" +
+        "------------------------------\n" +
+        "Nota  : " + t.notaNo + "\n" +
+        "Tgl   : " + t.date + " " + t.time + "\n" +
+        "Plgn  : " + t.customer + "\n" +
+        "Ksr   : " + t.staff + "\n" +
+        "------------------------------\n" +
+        "Telur Ayam   " + t.weight + "kg\n" +
+        "Harga/kg     Rp " + t.price.toLocaleString('id-ID') + "\n" +
+        "------------------------------\n" +
+        "TOTAL        Rp " + t.total.toLocaleString('id-ID') + "\n" +
+        "------------------------------\n" +
+        "   Terima Kasih Atas\n" +
+        "   Kepercayaan Anda\n\n\n\n";
+    window.location.href = "rawbt:base64," + btoa(struk);
 }
 
-// LAPORAN PDF (A4)
-function printLaporan(tipe) {
-    const now = new Date();
-    let filtered = [];
-    let judul = '';
-
-    if(tipe === 'harian') {
-        const d = document.getElementById('reportDate').value;
-        if(!d) return alert('Pilih tanggal!');
-        filtered = transactions.filter(t => t.isoDate.startsWith(d));
-        judul = 'LAPORAN HARIAN - ' + d;
-    } else if(tipe === 'mingguan') {
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        filtered = transactions.filter(t => new Date(t.isoDate) >= weekAgo);
-        judul = 'LAPORAN MINGGUAN (7 HARI TERAKHIR)';
-    } else if(tipe === 'bulanan') {
-        const month = now.getMonth(), year = now.getFullYear();
-        filtered = transactions.filter(t => {
-            const d = new Date(t.isoDate);
-            return d.getMonth() === month && d.getFullYear() === year;
-        });
-        judul = 'LAPORAN BULANAN ' + (month + 1) + '/' + year;
-    }
-
-    if(filtered.length === 0) return alert('Tidak ada data ditemukan.');
-
+// GENERATE PDF LAPORAN
+function generatePDF(tipe) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(14); doc.text(judul, 105, 15, {align:'center'});
-    doc.setFontSize(10);
-    let y = 25;
-    doc.text('Tanggal', 10, y); doc.text('Pelanggan', 45, y); doc.text('Berat', 100, y); doc.text('Total', 150, y);
-    doc.line(10, y+2, 200, y+2); y+=10;
+    const now = new Date();
+    let filteredData = [];
+    let title = "";
+
+    if (tipe === 'harian') {
+        const d = document.getElementById('reportDate').value;
+        if (!d) return alert("Pilih tanggal!");
+        filteredData = transactions.filter(t => t.isoDate === d);
+        title = "LAPORAN HARIAN - " + d;
+    } else if (tipe === 'mingguan') {
+        const lastWeek = new Date(now.setDate(now.getDate() - 7));
+        filteredData = transactions.filter(t => new Date(t.isoDate) >= lastWeek);
+        title = "LAPORAN MINGGUAN (7 HARI TERAKHIR)";
+    } else if (tipe === 'bulanan') {
+        filteredData = transactions.filter(t => {
+            const d = new Date(t.isoDate);
+            return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+        });
+        title = "LAPORAN BULANAN";
+    }
+
+    if (filteredData.length === 0) return alert("Data kosong.");
+
+    doc.text("BUMDES CAMPUREJO", 105, 15, { align: "center" });
+    doc.text(title, 105, 22, { align: "center" });
+
+    const rows = filteredData.map(t => [t.date, t.customer, t.weight + " kg", "Rp " + t.total.toLocaleString('id-ID')]);
+    doc.autoTable({ head: [['Tanggal', 'Pelanggan', 'Berat', 'Total']], body: rows, startY: 30 });
     
-    let totalS = 0;
-    filtered.forEach(t => {
-        doc.text(t.date, 10, y); doc.text(t.customer, 45, y); doc.text(t.weight + ' kg', 100, y); doc.text('Rp ' + t.total.toLocaleString('id-ID'), 150, y);
-        totalS += t.total; y+=7;
-    });
-    doc.line(10, y, 200, y); y+=7;
-    doc.setFontSize(12); doc.text('GRAND TOTAL: Rp ' + totalS.toLocaleString('id-ID'), 150, y, {align:'right'});
-    doc.save(tipe + '-laporan-bumdes.pdf');
+    const totalOmzet = filteredData.reduce((s, t) => s + t.total, 0);
+    doc.text("Total Omzet: Rp " + totalOmzet.toLocaleString('id-ID'), 14, doc.lastAutoTable.finalY + 10);
+    doc.save(`Laporan_${tipe}.pdf`);
 }
 
-// PENGATURAN DATA
+// BACKUP DATA (EXPORT)
 function exportData() {
+    if (transactions.length === 0) return alert("Tidak ada data untuk dibackup.");
     const blob = new Blob([JSON.stringify(transactions)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'backup_bumdes_' + new Date().toISOString().slice(0,10) + '.json';
+    a.download = 'backup_kasir_telur_' + new Date().toLocaleDateString('id-ID') + '.json';
     a.click();
 }
 
+// MASUKKAN DATA (IMPORT)
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
+    
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = function(e) {
         try {
-            const data = JSON.parse(e.target.result);
-            if (Array.isArray(data)) {
-                transactions = data;
-                localStorage.setItem('eggTransactions', JSON.stringify(transactions));
-                alert('✅ Import Data Berhasil!');
-                location.reload();
+            const importedData = JSON.parse(e.target.result);
+            if (Array.isArray(importedData)) {
+                if (confirm(`Impor ${importedData.length} data? Data lama akan digabung.`)) {
+                    // Menggabungkan data lama dengan data baru
+                    transactions = [...transactions, ...importedData];
+                    // Menghilangkan duplikat berdasarkan ID (opsional)
+                    transactions = Array.from(new Set(transactions.map(a => a.id)))
+                                   .map(id => transactions.find(a => a.id === id));
+                    
+                    localStorage.setItem('eggTransactions', JSON.stringify(transactions));
+                    alert("Data berhasil diimpor!");
+                    updateHistoryTable();
+                }
+            } else {
+                alert("Format file tidak valid.");
             }
-        } catch (err) { alert('❌ Format file salah.'); }
+        } catch (err) {
+            alert("Gagal membaca file: " + err);
+        }
     };
     reader.readAsText(file);
 }
 
 function resetData() {
-    if(confirm('⚠️ HAPUS SEMUA DATA? Tindakan ini permanen.')) {
+    if(confirm('Hapus semua data permanen?')) {
         localStorage.clear();
+        transactions = [];
         location.reload();
     }
 }
