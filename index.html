@@ -31,7 +31,7 @@
 
   <div id="transaksi" class="tab-content active-tab">
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-      <h2 class="text-xl font-bold mb-6 text-gray-700 border-l-4 border-green-500 pl-4">Transaksi Baru</h2>
+      <h2 id="formTitle" class="text-xl font-bold mb-6 text-gray-700 border-l-4 border-green-500 pl-4">Transaksi Baru</h2>
       <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <input id="customerName" required placeholder="Nama Pembeli" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition">
         <input id="staffName" required placeholder="Petugas" class="bg-gray-50 border-2 border-transparent focus:border-green-500 p-3 rounded-xl outline-none transition">
@@ -41,7 +41,7 @@
             <span class="text-xs font-bold text-green-600 uppercase block mb-1 tracking-widest">Total Bayar</span>
             <input id="totalAmount" readonly class="bg-transparent text-4xl font-black text-green-700 text-center w-full outline-none">
         </div>
-        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg shadow-green-200 transition-all active:scale-95">💾 SIMPAN & CETAK STRUK</button>
+        <button type="submit" id="btnSubmit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg shadow-green-200 transition-all active:scale-95">💾 SIMPAN & CETAK STRUK</button>
       </form>
     </div>
   </div>
@@ -87,23 +87,18 @@
   <div id="pengaturan" class="tab-content">
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md mx-auto">
       <h2 class="text-lg font-bold mb-6 text-center text-gray-700 border-b pb-2">⚙️ Manajemen Data</h2>
-      
       <div class="space-y-4">
           <div>
               <label class="text-xs font-bold text-gray-500 uppercase">Salin Data (Backup)</label>
               <button onclick="exportData()" class="w-full mt-1 bg-blue-500 text-white p-3 rounded-xl font-bold hover:bg-blue-600 transition">📤 Backup ke File .json</button>
           </div>
-
           <hr>
-
           <div>
               <label class="text-xs font-bold text-gray-500 uppercase">Masukkan Data (Import)</label>
               <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
               <button onclick="document.getElementById('importFile').click()" class="w-full mt-1 bg-orange-500 text-white p-3 rounded-xl font-bold hover:bg-orange-600 transition">📥 Pilih File Backup</button>
           </div>
-
           <hr>
-
           <div>
               <label class="text-xs font-bold text-gray-400 uppercase">Hapus Permanen</label>
               <button onclick="resetData()" class="w-full mt-1 bg-red-50 text-red-600 p-3 rounded-xl font-bold hover:bg-red-100 transition">⚠️ Kosongkan Semua Data</button>
@@ -115,8 +110,8 @@
 
 <script>
 let transactions = JSON.parse(localStorage.getItem('eggTransactions')) || [];
+let editId = null; // Menyimpan ID data yang sedang diedit
 
-// HITUNG TOTAL OTOMATIS
 const weightInput = document.getElementById('eggWeight');
 const priceInput = document.getElementById('pricePerKg');
 const totalInput = document.getElementById('totalAmount');
@@ -129,9 +124,17 @@ const totalInput = document.getElementById('totalAmount');
     });
 });
 
-// SIMPAN & CETAK
 document.getElementById('salesForm').addEventListener('submit', (e) => {
   e.preventDefault();
+  
+  // Jika sedang mode edit, hapus data lama dulu berdasarkan ID
+  if (editId) {
+      transactions = transactions.filter(t => t.id !== editId);
+      editId = null;
+      document.getElementById('formTitle').innerText = "Transaksi Baru";
+      document.getElementById('formTitle').classList.replace('border-orange-500', 'border-green-500');
+  }
+
   const now = new Date();
   const trx = {
     id: Date.now(),
@@ -145,6 +148,7 @@ document.getElementById('salesForm').addEventListener('submit', (e) => {
     price: parseFloat(priceInput.value),
     total: parseFloat(weightInput.value) * parseFloat(priceInput.value)
   };
+  
   transactions.push(trx);
   localStorage.setItem('eggTransactions', JSON.stringify(transactions));
   printRawBT(trx); 
@@ -168,15 +172,43 @@ function updateHistoryTable() {
                 <td class="p-4 font-bold">${t.customer}</td>
                 <td class="p-4">${t.weight} kg</td>
                 <td class="p-4 font-black text-green-700">Rp ${t.total.toLocaleString('id-ID')}</td>
-                <td class="p-4 text-center">
-                    <button onclick='printRawBT(${JSON.stringify(t)})' class="bg-blue-600 text-white px-3 py-1 rounded text-[10px] font-bold uppercase">Cetak</button>
+                <td class="p-4 flex gap-2 justify-center">
+                    <button onclick='printRawBT(${JSON.stringify(t)})' class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-bold uppercase">Struk</button>
+                    <button onclick='editTransaction(${t.id})' class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-[10px] font-bold uppercase">Edit</button>
+                    <button onclick='deleteTransaction(${t.id})' class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold uppercase">Hapus</button>
                 </td>
             </tr>
         `;
     });
 }
 
-// CETAK RAWBT
+// FUNGSI EDIT: Mengisi kembali form input
+function editTransaction(id) {
+    const t = transactions.find(item => item.id === id);
+    if (t) {
+        editId = t.id;
+        document.getElementById('customerName').value = t.customer;
+        document.getElementById('staffName').value = t.staff;
+        document.getElementById('eggWeight').value = t.weight;
+        document.getElementById('pricePerKg').value = t.price;
+        totalInput.value = 'Rp ' + t.total.toLocaleString('id-ID');
+        
+        document.getElementById('formTitle').innerText = "Edit Transaksi (Mode Edit)";
+        document.getElementById('formTitle').classList.replace('border-green-500', 'border-orange-500');
+        showTab('transaksi');
+        window.scrollTo(0,0);
+    }
+}
+
+// FUNGSI HAPUS SATUAN
+function deleteTransaction(id) {
+    if (confirm("Hapus data transaksi ini dari riwayat?")) {
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('eggTransactions', JSON.stringify(transactions));
+        updateHistoryTable();
+    }
+}
+
 function printRawBT(t) {
     let struk = 
         "------------------------------\n" +
@@ -198,7 +230,6 @@ function printRawBT(t) {
     window.location.href = "rawbt:base64," + btoa(struk);
 }
 
-// GENERATE PDF LAPORAN
 function generatePDF(tipe) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -227,52 +258,38 @@ function generatePDF(tipe) {
 
     doc.text("BUMDES CAMPUREJO", 105, 15, { align: "center" });
     doc.text(title, 105, 22, { align: "center" });
-
     const rows = filteredData.map(t => [t.date, t.customer, t.weight + " kg", "Rp " + t.total.toLocaleString('id-ID')]);
     doc.autoTable({ head: [['Tanggal', 'Pelanggan', 'Berat', 'Total']], body: rows, startY: 30 });
-    
     const totalOmzet = filteredData.reduce((s, t) => s + t.total, 0);
     doc.text("Total Omzet: Rp " + totalOmzet.toLocaleString('id-ID'), 14, doc.lastAutoTable.finalY + 10);
     doc.save(`Laporan_${tipe}.pdf`);
 }
 
-// BACKUP DATA (EXPORT)
 function exportData() {
-    if (transactions.length === 0) return alert("Tidak ada data untuk dibackup.");
     const blob = new Blob([JSON.stringify(transactions)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'backup_kasir_telur_' + new Date().toLocaleDateString('id-ID') + '.json';
+    a.download = 'backup_kasir_telur.json';
     a.click();
 }
 
-// MASUKKAN DATA (IMPORT)
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const importedData = JSON.parse(e.target.result);
             if (Array.isArray(importedData)) {
-                if (confirm(`Impor ${importedData.length} data? Data lama akan digabung.`)) {
-                    // Menggabungkan data lama dengan data baru
+                if (confirm(`Impor ${importedData.length} data?`)) {
                     transactions = [...transactions, ...importedData];
-                    // Menghilangkan duplikat berdasarkan ID (opsional)
-                    transactions = Array.from(new Set(transactions.map(a => a.id)))
-                                   .map(id => transactions.find(a => a.id === id));
-                    
+                    transactions = Array.from(new Set(transactions.map(a => a.id))).map(id => transactions.find(a => a.id === id));
                     localStorage.setItem('eggTransactions', JSON.stringify(transactions));
                     alert("Data berhasil diimpor!");
                     updateHistoryTable();
                 }
-            } else {
-                alert("Format file tidak valid.");
             }
-        } catch (err) {
-            alert("Gagal membaca file: " + err);
-        }
+        } catch (err) { alert("Gagal impor."); }
     };
     reader.readAsText(file);
 }
