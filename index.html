@@ -18,7 +18,7 @@
 <div class="max-w-6xl mx-auto p-4">
   <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
       <div>
-        <h1 class="text-2xl font-black text-gray-800 tracking-tight">🥚 BUMDES CAMPUREJO</h1>
+        <h1 class="text-2xl font-black text-gray-800 tracking-tight">  BUMDES CAMPUREJO</h1>
         <p class="text-[10px] text-green-600 uppercase tracking-[0.2em] font-bold">Sukses Mandiri</p>
       </div>
       <nav class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0 bg-gray-100 p-1 rounded-xl">
@@ -26,7 +26,7 @@
           <button onclick="showTab('pengeluaran')" class="px-4 py-2 hover:bg-white rounded-lg text-xs font-bold transition-all">Biaya</button>
           <button onclick="showTab('riwayat')" class="px-4 py-2 hover:bg-white rounded-lg text-xs font-bold transition-all">Riwayat</button>
           <button onclick="showTab('laporan')" class="px-4 py-2 hover:bg-white rounded-lg text-xs font-bold transition-all">Laporan</button>
-          <button onclick="showTab('pengaturan')" class="px-4 py-2 hover:bg-white rounded-lg text-xs font-bold transition-all">⚙️ Setting</button>
+          <button onclick="showTab('pengaturan')" class="px-4 py-2 hover:bg-white rounded-lg text-xs font-bold transition-all">   Setting</button>
       </nav>
   </div>
 
@@ -50,7 +50,7 @@
             <span class="text-xs font-bold text-green-600 uppercase block mb-1 tracking-widest">Total Bayar</span>
             <input id="totalAmount" readonly class="bg-transparent text-4xl font-black text-green-700 text-center w-full outline-none">
         </div>
-        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg transition-all active:scale-95">💾 SIMPAN & CETAK STRUK</button>
+        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-black shadow-lg transition-all active:scale-95">  SIMPAN & CETAK STRUK</button>
       </form>
     </div>
   </div>
@@ -69,7 +69,7 @@
 
   <div id="riwayat" class="tab-content">
     <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-      <h2 class="text-lg font-bold mb-4">📜 Riwayat Penjualan</h2>
+      <h2 class="text-lg font-bold mb-4">  Riwayat Penjualan</h2>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead class="bg-gray-50 text-gray-500 uppercase text-[10px] font-bold">
@@ -84,57 +84,72 @@
   <div id="laporan" class="tab-content">
     <div class="bg-white p-6 rounded-2xl shadow-xl mb-6 border border-gray-100">
         <div class="flex justify-between items-center mb-4 border-b pb-2">
-            <h2 class="text-lg font-black">📊 Laporan Kas Bulanan</h2>
-            <button onclick="exportKasPDF()" class="text-[10px] bg-gray-800 text-white px-3 py-1 rounded font-bold uppercase">Cetak PDF Kas</button>
+            <h2 class="text-lg font-black">  Rekap Kas Bulanan</h2>
+            <button onclick="exportKasPDF()" class="text-[10px] bg-gray-800 text-white px-3 py-1 rounded font-bold uppercase">Cetak Laporan Lengkap</button>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto mb-8">
             <table id="tableKas" class="w-full text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-gray-600 text-[10px] uppercase font-bold text-left">
-                        <th class="p-3 border-b">Periode</th>
+                        <th class="p-3 border-b">Bulan</th>
                         <th class="p-3 border-b text-right">Saldo Awal</th>
-                        <th class="p-3 border-b text-right">Penjualan (+)</th>
-                        <th class="p-3 border-b text-right">Biaya (-)</th>
+                        <th class="p-3 border-b text-right text-green-700">Penjualan (+)</th>
+                        <th class="p-3 border-b text-right text-red-600">Biaya (-)</th>
                         <th class="p-3 border-b text-right font-bold text-gray-900">Saldo Akhir</th>
                     </tr>
                 </thead>
                 <tbody id="financialReportBody"></tbody>
             </table>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-green-500">
-            <h3 class="font-bold mb-2 text-sm">PDF Harian</h3>
-            <input type="date" id="reportDate" class="w-full border p-2 mb-3 rounded-lg text-sm">
-            <button onclick="generatePDF('harian')" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold">Download</button>
+        <h3 class="text-sm font-black mb-3 text-gray-700 uppercase tracking-wider italic">Rincian Pengeluaran Biaya:</h3>
+        <div class="overflow-x-auto mb-6">
+            <table id="tableRincianBiaya" class="w-full text-xs">
+                <thead>
+                    <tr class="bg-red-50 text-red-700 text-[10px] uppercase font-bold text-left">
+                        <th class="p-2 border-b">Tanggal</th>
+                        <th class="p-2 border-b">Keterangan Biaya</th>
+                        <th class="p-2 border-b text-right">Jumlah (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseDetailBody"></tbody>
+            </table>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 text-center">
-            <h3 class="font-bold mb-2 text-sm">PDF Mingguan</h3>
-            <button onclick="generatePDF('mingguan')" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold mt-10">Download</button>
-        </div>
-        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500 text-center">
-            <h3 class="font-bold mb-2 text-sm">PDF Bulanan</h3>
-            <button onclick="generatePDF('bulanan')" class="w-full bg-purple-600 text-white p-3 rounded-xl font-bold mt-10">Download</button>
+
+        <h3 class="text-sm font-black mb-4 text-gray-700 uppercase pt-4 border-t">Download Laporan Penjualan (PDF):</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <p class="font-bold text-xs mb-2">Harian</p>
+                <input type="date" id="reportDate" class="w-full border p-2 mb-3 rounded-lg text-sm">
+                <button onclick="generatePDF('harian')" class="w-full bg-green-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Harian</button>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-end">
+                <p class="font-bold text-xs mb-2">Mingguan (7 Hari Terakhir)</p>
+                <button onclick="generatePDF('mingguan')" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Mingguan</button>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-end">
+                <p class="font-bold text-xs mb-2">Bulanan (Bulan Ini)</p>
+                <button onclick="generatePDF('bulanan')" class="w-full bg-purple-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Bulanan</button>
+            </div>
         </div>
     </div>
   </div>
 
   <div id="pengaturan" class="tab-content">
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md mx-auto">
-      <h2 class="text-lg font-bold mb-6 text-center text-gray-700 border-b pb-4 italic">⚙️ Manajemen Data</h2>
+      <h2 class="text-lg font-bold mb-6 text-center text-gray-700 border-b pb-4 italic">   Manajemen Data</h2>
       <div class="space-y-4 text-center">
-          <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black">📤 BACKUP DATA (.JSON)</button>
+          <p class="text-[10px] text-green-600 font-bold mb-2 uppercase">Fitur Gabung Data Aktif (Biaya Tidak Akan Hilang)</p>
+          <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black">  BACKUP DATA (.JSON)</button>
           <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
-          <button onclick="document.getElementById('importFile').click()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-black">📥 IMPORT DATA</button>
-          <button onclick="resetData()" class="w-full bg-red-50 text-red-600 p-4 rounded-xl font-black border-2 border-red-100">⚠️ RESET SEMUA DATA</button>
+          <button onclick="document.getElementById('importFile').click()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-black">  IMPORT & GABUNG DATA</button>
+          <button onclick="resetData()" class="w-full bg-red-50 text-red-600 p-4 rounded-xl font-black border-2 border-red-100">   RESET SEMUA DATA</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// --- LOGIKA DATABASE ---
 let transactions = JSON.parse(localStorage.getItem('eggTransactions')) || [];
 let expenses = JSON.parse(localStorage.getItem('eggExpenses')) || [];
 let editId = null;
@@ -144,7 +159,6 @@ function saveAll() {
     localStorage.setItem('eggExpenses', JSON.stringify(expenses));
 }
 
-// --- DASHBOARD & INPUT ---
 function updateDashboard() {
     const today = new Date().toISOString().split('T')[0];
     const todayTotal = transactions.filter(t => t.isoDate === today).reduce((sum, t) => sum + t.total, 0);
@@ -154,12 +168,14 @@ function updateDashboard() {
 
 const wInput = document.getElementById('eggWeight');
 const pInput = document.getElementById('pricePerKg');
-[wInput, pInput].forEach(el => {
-    el.addEventListener('input', () => {
-        const t = (parseFloat(wInput.value) || 0) * (parseFloat(pInput.value) || 0);
-        document.getElementById('totalAmount').value = 'Rp ' + t.toLocaleString('id-ID');
+if(wInput && pInput) {
+    [wInput, pInput].forEach(el => {
+        el.addEventListener('input', () => {
+            const t = (parseFloat(wInput.value) || 0) * (parseFloat(pInput.value) || 0);
+            document.getElementById('totalAmount').value = 'Rp ' + t.toLocaleString('id-ID');
+        });
     });
-});
+}
 
 document.getElementById('salesForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -194,7 +210,6 @@ document.getElementById('expenseForm').addEventListener('submit', (e) => {
     expenses.push(exp); saveAll(); e.target.reset(); updateExpenseTable();
 });
 
-// --- NAVIGATION ---
 function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab'));
     document.getElementById(tabId).classList.add('active-tab');
@@ -204,11 +219,10 @@ function showTab(tabId) {
     updateDashboard();
 }
 
-// --- TABLES ---
 function updateHistoryTable() {
     const tbody = document.getElementById('historyTableBody');
     tbody.innerHTML = '';
-    transactions.slice().reverse().forEach(t => {
+    transactions.slice().sort((a,b) => b.id - a.id).forEach(t => {
         tbody.innerHTML += `<tr class="border-b text-xs"><td class="p-4">${t.date}</td><td class="p-4 font-bold">${t.customer}</td><td class="p-4 text-right font-bold text-green-700">Rp ${t.total.toLocaleString('id-ID')}</td><td class="p-4 flex gap-1 justify-center"><button onclick='printRawBT(${JSON.stringify(t)})' class="bg-blue-600 text-white px-2 py-1 rounded text-[10px]">STRUK</button><button onclick='editTrx(${t.id})' class="bg-orange-500 text-white px-2 py-1 rounded text-[10px]">EDIT</button><button onclick='delTrx(${t.id})' class="bg-red-500 text-white px-2 py-1 rounded text-[10px]">HAPUS</button></td></tr>`;
     });
 }
@@ -216,14 +230,16 @@ function updateHistoryTable() {
 function updateExpenseTable() {
     const tbody = document.getElementById('expenseTableBody');
     tbody.innerHTML = '';
-    expenses.slice().reverse().forEach(e => {
+    expenses.slice().sort((a,b) => b.id - a.id).forEach(e => {
         tbody.innerHTML += `<tr class="border-b text-xs"><td class="p-3">${e.date}</td><td class="p-3 font-medium">${e.name}</td><td class="p-3 text-right font-bold text-red-600">Rp ${e.amount.toLocaleString('id-ID')}</td><td class="p-3 text-center"><button onclick="delExp(${e.id})" class="text-red-400 font-bold text-[10px]">HAPUS</button></td></tr>`;
     });
 }
 
 function updateFinancialReport() {
     const tbody = document.getElementById('financialReportBody');
-    tbody.innerHTML = '';
+    const expBody = document.getElementById('expenseDetailBody');
+    tbody.innerHTML = ''; expBody.innerHTML = '';
+
     const monthly = {};
     transactions.forEach(t => {
         const month = t.isoDate.substring(0, 7);
@@ -235,18 +251,26 @@ function updateFinancialReport() {
         if(!monthly[month]) monthly[month] = { in: 0, out: 0 };
         monthly[month].out += e.amount;
     });
-    const sorted = Object.keys(monthly).sort();
+
+    const sortedMonths = Object.keys(monthly).sort();
     let currentSaldo = 0;
-    if(sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-gray-400">Belum ada data.</td></tr>'; return; }
-    sorted.forEach(m => {
+    sortedMonths.forEach(m => {
         const sAwal = currentSaldo;
         const sAkhir = sAwal + monthly[m].in - monthly[m].out;
-        tbody.innerHTML += `<tr class="border-b text-xs"><td class="p-3 font-bold">${m}</td><td class="p-3 text-right">Rp ${sAwal.toLocaleString('id-ID')}</td><td class="p-3 text-right text-green-600">+${monthly[m].in.toLocaleString('id-ID')}</td><td class="p-3 text-right text-red-500">-${monthly[m].out.toLocaleString('id-ID')}</td><td class="p-3 text-right font-black bg-green-50">Rp ${sAkhir.toLocaleString('id-ID')}</td></tr>`;
+        tbody.innerHTML += `<tr class="border-b text-xs"><td class="p-3 font-bold">${m}</td><td class="p-3 text-right text-gray-500">Rp ${sAwal.toLocaleString('id-ID')}</td><td class="p-3 text-right text-green-600 font-bold">+${monthly[m].in.toLocaleString('id-ID')}</td><td class="p-3 text-right text-red-500 font-bold">-${monthly[m].out.toLocaleString('id-ID')}</td><td class="p-3 text-right font-black bg-green-50">Rp ${sAkhir.toLocaleString('id-ID')}</td></tr>`;
         currentSaldo = sAkhir;
     });
+
+    if(expenses.length > 0) {
+        expenses.slice().sort((a,b) => b.id - a.id).forEach(e => {
+            expBody.innerHTML += `<tr class="border-b"><td class="p-2">${e.date}</td><td class="p-2 font-medium">${e.name}</td><td class="p-2 text-right text-red-600 font-bold">Rp ${e.amount.toLocaleString('id-ID')}</td></tr>`;
+        });
+    } else {
+        expBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400 italic">Belum ada rincian biaya.</td></tr>';
+    }
 }
 
-// --- PDF GENERATION ---
+// PDF GENERATION
 function generatePDF(tipe) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -256,16 +280,17 @@ function generatePDF(tipe) {
         const d = document.getElementById('reportDate').value;
         if(!d) return alert("Pilih tanggal!");
         data = transactions.filter(t => t.isoDate === d);
-        title = "LAPORAN HARIAN: " + d;
+        title = "LAPORAN PENJUALAN HARIAN: " + d;
     } else if(tipe === 'mingguan') {
         const limit = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
         data = transactions.filter(t => t.isoDate >= limit);
-        title = "LAPORAN MINGGUAN (7 HARI)";
+        title = "LAPORAN PENJUALAN MINGGUAN (7 HARI)";
     } else if(tipe === 'bulanan') {
         const m = new Date().toISOString().substring(0, 7);
         data = transactions.filter(t => t.isoDate.startsWith(m));
-        title = "LAPORAN BULANAN";
+        title = "LAPORAN PENJUALAN BULANAN";
     }
+    
     if(data.length === 0) return alert("Data tidak ditemukan.");
     
     const totalOmzet = data.reduce((sum, item) => sum + item.total, 0);
@@ -280,7 +305,10 @@ function generatePDF(tipe) {
         body: rows, 
         startY: 30,
         didParseCell: function (data) {
-            if (data.row.index === rows.length - 1) { data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = [240, 240, 240]; }
+            if (data.row.index === rows.length - 1) { 
+                data.cell.styles.fontStyle = 'bold'; 
+                data.cell.styles.fillColor = [240, 240, 240]; 
+            }
         }
     });
     doc.save(`Laporan_${tipe}.pdf`);
@@ -289,37 +317,40 @@ function generatePDF(tipe) {
 function exportKasPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text("LAPORAN KAS - BUMDES CAMPUREJO", 105, 15, { align: "center" });
-    doc.autoTable({ html: '#tableKas', startY: 25 });
-    doc.save("Laporan_Kas.pdf");
+    doc.setFontSize(14);
+    doc.text("LAPORAN KAS BULANAN & RINCIAN BIAYA", 105, 15, { align: "center" });
+    doc.setFontSize(10);
+    doc.text("BUMDES CAMPUREJO - SUKSES MANDIRI", 105, 22, { align: "center" });
+    
+    doc.autoTable({ html: '#tableKas', startY: 30, headStyles: { fillColor: [40, 167, 69] } });
+    doc.text("RINCIAN PENGELUARAN BIAYA", 14, doc.lastAutoTable.finalY + 15);
+    doc.autoTable({ html: '#tableRincianBiaya', startY: doc.lastAutoTable.finalY + 20, headStyles: { fillColor: [220, 53, 69] } });
+    
+    doc.save("Laporan_Kas_Lengkap.pdf");
 }
 
-// --- PENYEMPURNAAN IMPORT (FIXED) ---
 function importData(e) {
     const file = e.target.files[0];
     if(!file) return;
     const reader = new FileReader();
     reader.onload = function(f) {
         try {
-            const rawData = JSON.parse(f.target.result);
-            
-            // Logika Cerdas: Cek apakah format file gabungan atau hanya daftar transaksi
-            if (Array.isArray(rawData)) {
-                // Jika file berupa array (seperti file backup_kasir_telur.json Anda)
-                transactions = rawData;
-                expenses = []; // Reset biaya karena tidak ada di file
-            } else {
-                // Jika file berupa objek gabungan {transactions, expenses}
-                transactions = rawData.transactions || [];
-                expenses = rawData.expenses || [];
-            }
-            
+            const imported = JSON.parse(f.target.result);
+            let newTrx = imported.transactions || [];
+            let newExp = imported.expenses || [];
+
+            newTrx.forEach(t => {
+                if(!transactions.find(exist => exist.id === t.id)) { transactions.push(t); }
+            });
+            newExp.forEach(e => {
+                if(!expenses.find(exist => exist.id === e.id)) { expenses.push(e); }
+            });
+
             saveAll();
-            alert("✅ Berhasil! " + transactions.length + " data transaksi telah dimuat.");
+            alert("Data berhasil digabungkan!");
             location.reload();
         } catch(err) {
-            alert("❌ Gagal membaca file. Pastikan format file .json benar.");
-            console.error(err);
+            alert("Format file tidak valid.");
         }
     };
     reader.readAsText(file);
@@ -333,7 +364,6 @@ function exportData() {
     a.click();
 }
 
-// --- OTHERS ---
 function editTrx(id) {
     const t = transactions.find(i => i.id === id);
     if(t) {
@@ -355,7 +385,6 @@ function printRawBT(t) {
     window.location.href = "rawbt:base64," + btoa(s);
 }
 
-// Init
 updateDashboard();
 </script>
 </body>
