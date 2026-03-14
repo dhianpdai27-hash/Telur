@@ -38,7 +38,6 @@
         </div>
         <div class="text-right text-[10px] font-bold opacity-80" id="todayDateDisplay"></div>
     </div>
-
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
       <h2 id="formTitle" class="text-xl font-bold mb-6 text-gray-700 border-l-4 border-green-500 pl-4">Transaksi Baru</h2>
       <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -83,18 +82,31 @@
 
   <div id="laporan" class="tab-content">
     <div class="bg-white p-6 rounded-2xl shadow-xl mb-6 border border-gray-100">
-        <div class="flex justify-between items-center mb-4 border-b pb-2">
-            <h2 class="text-lg font-black">  Rekap Kas Bulanan</h2>
-            <button onclick="exportKasPDF()" class="text-[10px] bg-gray-800 text-white px-3 py-1 rounded font-bold uppercase">Cetak Laporan Lengkap</button>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b pb-4">
+            <div>
+                <h2 class="text-lg font-black uppercase">Rekap Bulanan</h2>
+                <p class="text-[10px] text-gray-500 font-bold italic">Saldo berlanjut dari bulan ke bulan</p>
+            </div>
+            <div class="flex gap-2 bg-gray-100 p-2 rounded-xl">
+                <select id="filterMonth" class="bg-white border rounded-lg p-2 text-xs font-bold outline-none" onchange="updateFinancialReport()">
+                    <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option>
+                    <option value="04">April</option><option value="05">Mei</option><option value="06">Juni</option>
+                    <option value="07">Juli</option><option value="08">Agustus</option><option value="09">September</option>
+                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="filterYear" class="bg-white border rounded-lg p-2 text-xs font-bold outline-none" onchange="updateFinancialReport()"></select>
+                <button onclick="exportKasPDF()" class="bg-gray-800 text-white px-3 py-2 rounded-lg text-[10px] font-bold uppercase">Cetak PDF</button>
+            </div>
         </div>
+
         <div class="overflow-x-auto mb-8">
             <table id="tableKas" class="w-full text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-gray-600 text-[10px] uppercase font-bold text-left">
-                        <th class="p-3 border-b">Bulan</th>
+                        <th class="p-3 border-b">Periode</th>
                         <th class="p-3 border-b text-right">Saldo Awal</th>
                         <th class="p-3 border-b text-right text-green-700">Penjualan (+)</th>
-                        <th class="p-3 border-b text-right text-red-600">Biaya (-)</th>
+                        <th class="p-3 border-b text-right text-red-600">Total Biaya (-)</th>
                         <th class="p-3 border-b text-right font-bold text-gray-900">Saldo Akhir</th>
                     </tr>
                 </thead>
@@ -102,8 +114,8 @@
             </table>
         </div>
 
-        <h3 class="text-sm font-black mb-3 text-gray-700 uppercase tracking-wider italic">Rincian Pengeluaran Biaya:</h3>
-        <div class="overflow-x-auto mb-6">
+        <h3 class="text-sm font-black mb-3 text-gray-700 uppercase tracking-wider italic">Rincian Biaya Bulan Ini:</h3>
+        <div class="overflow-x-auto">
             <table id="tableRincianBiaya" class="w-full text-xs">
                 <thead>
                     <tr class="bg-red-50 text-red-700 text-[10px] uppercase font-bold text-left">
@@ -115,23 +127,6 @@
                 <tbody id="expenseDetailBody"></tbody>
             </table>
         </div>
-
-        <h3 class="text-sm font-black mb-4 text-gray-700 uppercase pt-4 border-t">Download Laporan Penjualan (PDF):</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <p class="font-bold text-xs mb-2">Harian</p>
-                <input type="date" id="reportDate" class="w-full border p-2 mb-3 rounded-lg text-sm">
-                <button onclick="generatePDF('harian')" class="w-full bg-green-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Harian</button>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-end">
-                <p class="font-bold text-xs mb-2">Mingguan (7 Hari Terakhir)</p>
-                <button onclick="generatePDF('mingguan')" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Mingguan</button>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-end">
-                <p class="font-bold text-xs mb-2">Bulanan (Bulan Ini)</p>
-                <button onclick="generatePDF('bulanan')" class="w-full bg-purple-600 text-white p-2 rounded-lg font-bold text-xs">Cetak Bulanan</button>
-            </div>
-        </div>
     </div>
   </div>
 
@@ -139,7 +134,7 @@
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md mx-auto">
       <h2 class="text-lg font-bold mb-6 text-center text-gray-700 border-b pb-4 italic">   Manajemen Data</h2>
       <div class="space-y-4 text-center">
-          <p class="text-[10px] text-green-600 font-bold mb-2 uppercase">Fitur Gabung Data Aktif (Biaya Tidak Akan Hilang)</p>
+          <p class="text-[10px] text-green-600 font-bold mb-2 uppercase">GABUNG DATA AKTIF (Biaya Aman)</p>
           <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black">  BACKUP DATA (.JSON)</button>
           <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
           <button onclick="document.getElementById('importFile').click()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-black">  IMPORT & GABUNG DATA</button>
@@ -153,6 +148,19 @@
 let transactions = JSON.parse(localStorage.getItem('eggTransactions')) || [];
 let expenses = JSON.parse(localStorage.getItem('eggExpenses')) || [];
 let editId = null;
+
+// INIT SELECT TAHUN
+function initYearFilter() {
+    const yr = document.getElementById('filterYear');
+    const curYear = new Date().getFullYear();
+    const curMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+    document.getElementById('filterMonth').value = curMonth;
+    for(let i = curYear; i >= curYear-2; i--) {
+        let opt = document.createElement('option');
+        opt.value = i; opt.innerHTML = i;
+        yr.appendChild(opt);
+    }
+}
 
 function saveAll() {
     localStorage.setItem('eggTransactions', JSON.stringify(transactions));
@@ -193,9 +201,7 @@ document.getElementById('salesForm').addEventListener('submit', (e) => {
         price: parseFloat(pInput.value),
         total: parseFloat(wInput.value) * parseFloat(pInput.value)
     };
-    transactions.push(trx);
-    saveAll(); printRawBT(trx); e.target.reset(); document.getElementById('totalAmount').value = '';
-    updateDashboard();
+    transactions.push(trx); saveAll(); printRawBT(trx); e.target.reset(); document.getElementById('totalAmount').value = ''; updateDashboard();
 });
 
 document.getElementById('expenseForm').addEventListener('submit', (e) => {
@@ -235,98 +241,60 @@ function updateExpenseTable() {
     });
 }
 
+// LOGIKA LAPORAN TERFILTER BULAN & TAHUN
 function updateFinancialReport() {
+    const selMonth = document.getElementById('filterMonth').value;
+    const selYear = document.getElementById('filterYear').value;
+    const targetPeriod = `${selYear}-${selMonth}`;
+
     const tbody = document.getElementById('financialReportBody');
     const expBody = document.getElementById('expenseDetailBody');
     tbody.innerHTML = ''; expBody.innerHTML = '';
 
-    const monthly = {};
-    transactions.forEach(t => {
-        const month = t.isoDate.substring(0, 7);
-        if(!monthly[month]) monthly[month] = { in: 0, out: 0 };
-        monthly[month].in += t.total;
-    });
-    expenses.forEach(e => {
-        const month = e.isoDate.substring(0, 7);
-        if(!monthly[month]) monthly[month] = { in: 0, out: 0 };
-        monthly[month].out += e.amount;
-    });
+    // Hitung Saldo Awal (Dari transaksi/biaya SEBELUM bulan terpilih)
+    let saldoAwal = 0;
+    transactions.forEach(t => { if(t.isoDate.substring(0, 7) < targetPeriod) saldoAwal += t.total; });
+    expenses.forEach(e => { if(e.isoDate.substring(0, 7) < targetPeriod) saldoAwal -= e.amount; });
 
-    const sortedMonths = Object.keys(monthly).sort();
-    let currentSaldo = 0;
-    sortedMonths.forEach(m => {
-        const sAwal = currentSaldo;
-        const sAkhir = sAwal + monthly[m].in - monthly[m].out;
-        tbody.innerHTML += `<tr class="border-b text-xs"><td class="p-3 font-bold">${m}</td><td class="p-3 text-right text-gray-500">Rp ${sAwal.toLocaleString('id-ID')}</td><td class="p-3 text-right text-green-600 font-bold">+${monthly[m].in.toLocaleString('id-ID')}</td><td class="p-3 text-right text-red-500 font-bold">-${monthly[m].out.toLocaleString('id-ID')}</td><td class="p-3 text-right font-black bg-green-50">Rp ${sAkhir.toLocaleString('id-ID')}</td></tr>`;
-        currentSaldo = sAkhir;
-    });
+    // Hitung Penjualan & Biaya BULAN TERPILIH
+    let totalIn = transactions.filter(t => t.isoDate.startsWith(targetPeriod)).reduce((sum, t) => sum + t.total, 0);
+    let totalOut = expenses.filter(e => e.isoDate.startsWith(targetPeriod)).reduce((sum, e) => sum + e.amount, 0);
+    let saldoAkhir = saldoAwal + totalIn - totalOut;
 
-    if(expenses.length > 0) {
-        expenses.slice().sort((a,b) => b.id - a.id).forEach(e => {
+    const monthName = document.getElementById('filterMonth').options[document.getElementById('filterMonth').selectedIndex].text;
+    
+    tbody.innerHTML = `
+        <tr class="border-b text-xs">
+            <td class="p-3 font-black text-gray-700">${monthName} ${selYear}</td>
+            <td class="p-3 text-right text-gray-400">Rp ${saldoAwal.toLocaleString('id-ID')}</td>
+            <td class="p-3 text-right text-green-600 font-bold">+${totalIn.toLocaleString('id-ID')}</td>
+            <td class="p-3 text-right text-red-500 font-bold">-${totalOut.toLocaleString('id-ID')}</td>
+            <td class="p-3 text-right font-black bg-green-50 border-l-4 border-green-500">Rp ${saldoAkhir.toLocaleString('id-ID')}</td>
+        </tr>`;
+
+    // Tampilkan Rincian Biaya bulan terpilih
+    const filteredExp = expenses.filter(e => e.isoDate.startsWith(targetPeriod)).sort((a,b) => b.id - a.id);
+    if(filteredExp.length > 0) {
+        filteredExp.forEach(e => {
             expBody.innerHTML += `<tr class="border-b"><td class="p-2">${e.date}</td><td class="p-2 font-medium">${e.name}</td><td class="p-2 text-right text-red-600 font-bold">Rp ${e.amount.toLocaleString('id-ID')}</td></tr>`;
         });
     } else {
-        expBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400 italic">Belum ada rincian biaya.</td></tr>';
+        expBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400 italic">Tidak ada biaya di periode ini.</td></tr>';
     }
-}
-
-// PDF GENERATION
-function generatePDF(tipe) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let data = [];
-    let title = "";
-    if(tipe === 'harian') {
-        const d = document.getElementById('reportDate').value;
-        if(!d) return alert("Pilih tanggal!");
-        data = transactions.filter(t => t.isoDate === d);
-        title = "LAPORAN PENJUALAN HARIAN: " + d;
-    } else if(tipe === 'mingguan') {
-        const limit = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
-        data = transactions.filter(t => t.isoDate >= limit);
-        title = "LAPORAN PENJUALAN MINGGUAN (7 HARI)";
-    } else if(tipe === 'bulanan') {
-        const m = new Date().toISOString().substring(0, 7);
-        data = transactions.filter(t => t.isoDate.startsWith(m));
-        title = "LAPORAN PENJUALAN BULANAN";
-    }
-    
-    if(data.length === 0) return alert("Data tidak ditemukan.");
-    
-    const totalOmzet = data.reduce((sum, item) => sum + item.total, 0);
-    doc.text("BUMDES CAMPUREJO", 105, 15, { align: "center" });
-    doc.text(title, 105, 22, { align: "center" });
-    
-    const rows = data.map(t => [t.date, t.customer, t.weight+' kg', 'Rp '+t.total.toLocaleString('id-ID')]);
-    rows.push(['', '', 'TOTAL', 'Rp ' + totalOmzet.toLocaleString('id-ID')]);
-
-    doc.autoTable({ 
-        head: [['Tgl', 'Pelanggan', 'Berat', 'Subtotal']], 
-        body: rows, 
-        startY: 30,
-        didParseCell: function (data) {
-            if (data.row.index === rows.length - 1) { 
-                data.cell.styles.fontStyle = 'bold'; 
-                data.cell.styles.fillColor = [240, 240, 240]; 
-            }
-        }
-    });
-    doc.save(`Laporan_${tipe}.pdf`);
 }
 
 function exportKasPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const bln = document.getElementById('filterMonth').options[document.getElementById('filterMonth').selectedIndex].text;
+    const thn = document.getElementById('filterYear').value;
+
     doc.setFontSize(14);
-    doc.text("LAPORAN KAS BULANAN & RINCIAN BIAYA", 105, 15, { align: "center" });
-    doc.setFontSize(10);
-    doc.text("BUMDES CAMPUREJO - SUKSES MANDIRI", 105, 22, { align: "center" });
-    
-    doc.autoTable({ html: '#tableKas', startY: 30, headStyles: { fillColor: [40, 167, 69] } });
-    doc.text("RINCIAN PENGELUARAN BIAYA", 14, doc.lastAutoTable.finalY + 15);
-    doc.autoTable({ html: '#tableRincianBiaya', startY: doc.lastAutoTable.finalY + 20, headStyles: { fillColor: [220, 53, 69] } });
-    
-    doc.save("Laporan_Kas_Lengkap.pdf");
+    doc.text(`LAPORAN KAS BUMDES - ${bln.toUpperCase()} ${thn}`, 105, 15, { align: "center" });
+    doc.autoTable({ html: '#tableKas', startY: 25, headStyles: { fillColor: [40, 167, 69] } });
+    doc.text("RINCIAN BIAYA", 14, doc.lastAutoTable.finalY + 10);
+    doc.autoTable({ html: '#tableRincianBiaya', startY: doc.lastAutoTable.finalY + 15, headStyles: { fillColor: [220, 53, 69] } });
+    doc.save(`Laporan_Kas_${bln}_${thn}.pdf`);
 }
 
 function importData(e) {
@@ -338,20 +306,10 @@ function importData(e) {
             const imported = JSON.parse(f.target.result);
             let newTrx = imported.transactions || [];
             let newExp = imported.expenses || [];
-
-            newTrx.forEach(t => {
-                if(!transactions.find(exist => exist.id === t.id)) { transactions.push(t); }
-            });
-            newExp.forEach(e => {
-                if(!expenses.find(exist => exist.id === e.id)) { expenses.push(e); }
-            });
-
-            saveAll();
-            alert("Data berhasil digabungkan!");
-            location.reload();
-        } catch(err) {
-            alert("Format file tidak valid.");
-        }
+            newTrx.forEach(t => { if(!transactions.find(exist => exist.id === t.id)) { transactions.push(t); } });
+            newExp.forEach(e => { if(!expenses.find(exist => exist.id === e.id)) { expenses.push(e); } });
+            saveAll(); alert("Data Digabungkan!"); location.reload();
+        } catch(err) { alert("File tidak valid."); }
     };
     reader.readAsText(file);
 }
@@ -385,6 +343,7 @@ function printRawBT(t) {
     window.location.href = "rawbt:base64," + btoa(s);
 }
 
+initYearFilter();
 updateDashboard();
 </script>
 </body>
